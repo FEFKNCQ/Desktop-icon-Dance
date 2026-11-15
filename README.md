@@ -1,253 +1,249 @@
-**English** | [中文](README.zh-CN.md)
+**中文** | [English](README.en.md)
 
-# DesktopDance
+# 桌面图标跳舞 · DesktopDance
 
-**The icons on your desktop get up and play basketball.**
+**你桌面上的图标，会自己站起来打篮球。**
 
-Click **Start** and your files and app icons assemble into a little figure that dribbles and spins. The faster your music, the faster it plays. Press `Esc` and every icon is back where it was.
+点一下「开始蹦迪」，桌面上的文件和应用图标就拼成一个小人：运球、转身，你放的歌越快，它打得越快。按一下 `Esc`，所有图标回到原位。
 
-- 🏀 **Four modes**: Basketball, Line, Groove, Free
-- 🎵 **Follows your music**: it listens to what the computer is playing, no microphone
-- 🎯 **Your own icons**: it uses whatever is on your desktop, and you pick which icon is the ball
-- 🔒 **Your files are never touched**: nothing is deleted, renamed or moved; quit the app and the desktop is as it was
-- 💻 **Mac and Windows**, free for noncommercial use, source code available
+- 🏀 **四种玩法**：打篮球、列队、律动、自由
+- 🎵 **跟着音乐跳**：听的是电脑正在放的歌，不用麦克风
+- 🎯 **用你自己的图标**：桌面上有什么就用什么，哪个图标当篮球也由你挑
+- 🔒 **不动你的文件**：不删、不改名、不移动，关掉程序桌面就是原样
+- 💻 **Mac 和 Windows 都有**，非商业使用免费，源码公开
 
-![Demo](docs/demo.gif)
+![演示](docs/demo.gif)
 
-## Download
+## 下载
 
-<a href="https://github.com/jiafufang63-cpu/DesktopDance/releases/download/mac-v1.0/DesktopDance-mac.zip"><img src="docs/download-mac-en.svg" width="260" alt="Download for Mac"></a>
+<a href="https://github.com/FEFKNCQ/Desktop-icon-Dance-CN/releases/download/version/DesktopDance-mac.zip"><img src="docs/download-mac.svg" width="260" alt="下载 Mac 版"></a>
 &nbsp;&nbsp;
-<a href="https://github.com/jiafufang63-cpu/DesktopDance/releases/download/win-v1.0/DesktopDance-win.exe"><img src="docs/download-win-en.svg" width="260" alt="Download for Windows"></a>
+<a href="https://github.com/FEFKNCQ/Desktop-icon-Dance-CN/releases/download/version/DesktopDance-win.exe"><img src="docs/download-win.svg" width="260" alt="下载 Windows 版"></a>
 
-Click a button and the download starts. No sign-up, no login.
+点上面的按钮就会开始下载，不用注册、不用登录。
 
-- **Not sure which computer you have?** An Apple logo in the top-left corner of the screen means Mac; a four-square logo at the bottom of the screen means Windows.
-- **Mac** needs macOS 14.2 or later. To check: click the Apple logo in the top-left corner → "About This Mac".
-- **Windows** needs 64-bit Windows 10 or Windows 11. It has been tested by hand on a Windows 10 laptop, and every build is run automatically (start, every control, restore) on a machine of the Windows 11 generation. It has not been tried by hand on a Windows 11 PC yet, so if you hit a problem please [tell me here](https://github.com/jiafufang63-cpu/DesktopDance/issues/new) (needs a free GitHub account).
+- **不知道自己是哪种电脑？** 屏幕左上角有苹果图标的是 Mac；屏幕下方有四个小方块图标的是 Windows。
+- **Mac** 需要系统是 macOS 14.2 或更新。查看方法：点屏幕左上角的苹果图标 → 「关于本机」。
+- **Windows** 需要 64 位的 Windows 10 或 Windows 11。已在一台 Windows 10 笔记本上亲手测过；每次构建还会在一台和 Windows 11 同一代系统的机器上自动跑一遍（开始、逐项操作、恢复）。还没有人在 Windows 11 电脑上亲手试过，遇到问题请[在这里留言告诉我](https://github.com/FEFKNCQ/Desktop-icon-Dance-CN/issues/new)（需要一个免费的 GitHub 账号）。
 
-The app's own window is available in English and Chinese on both Mac and Windows. It follows your system language the first time; you can switch at the bottom of the window (**Language**).
+## Mac：怎么打开（只有第一次要多点几下）
 
-The screenshots of system messages below were captured on Chinese-language systems and re-labelled in English, so fonts and spacing may differ slightly from yours.
+**第 1 步：解压。** 下载完成后，打开「下载」文件夹，找到 `DesktopDance-mac.zip`，双击它。旁边会多出一个叫 `DesktopDance` 的图标（一个彩色小人）。（用 Safari 下载的话通常已经自动解压好了：「下载」里直接就有 `DesktopDance`，跳到第 2 步。）
 
-## Mac: how to open it (a few extra clicks, first time only)
+**第 2 步：双击 `DesktopDance`。** 会弹出下面这个提示。这是正常的：苹果对所有没有向它付费的免费软件都会这样提示，不代表软件有问题。点 **「完成」**。（不要点「移到废纸篓」。）
 
-**Step 1: Unzip.** When the download finishes, open your Downloads folder, find `DesktopDance-mac.zip` and double-click it. A new item called `DesktopDance` (a colourful little figure) appears next to it. (If you downloaded with Safari, it is usually unzipped already: `DesktopDance` is sitting in Downloads, so go straight to step 2.)
+<img src="docs/open-1.png" width="300" alt="提示：未打开 DesktopDance">
 
-**Step 2: Double-click `DesktopDance`.** You will see the message below. This is normal: Apple shows it for every free app whose author has not paid Apple for a certificate, and it does not mean anything is wrong. Click **Done**. (Do not click "Move to Trash".)
+**第 3 步：告诉电脑「我要打开它」。** 点屏幕左上角的苹果图标 → **「系统设置」** → 左边点 **「隐私与安全性」** → 右边一直往下翻，翻到「安全性」这几个字，下面有一行「已阻止 DesktopDance」，点它右边的 **「仍要打开」**。
 
-<img src="docs/open-1-en.png" width="300" alt="Message: DesktopDance was not opened. Click Done, the left button">
+<img src="docs/open-2.png" width="620" alt="系统设置里的「仍要打开」按钮">
 
-**Step 3: Tell your Mac you want to open it.** Click the Apple logo in the top-left corner → **System Settings** → **Privacy & Security** on the left → scroll all the way down on the right to "Security". There is a line saying DesktopDance was blocked; click **Open Anyway** next to it.
+**第 4 步：确认。** 再弹出一个窗口时，点 **「仍要打开」**，然后输入你的开机密码（或者按指纹）。
 
-<img src="docs/open-2-en.png" width="620" alt="The Open Anyway button in System Settings">
+完成。以后直接双击 `DesktopDance` 就能打开，不用再做这几步。
 
-**Step 4: Confirm.** Another window appears; click **Open Anyway**, then type your Mac's password (or use Touch ID).
+> 找不到「仍要打开」？先回去再双击一次 `DesktopDance`，点「完成」，然后马上去「隐私与安全性」里看。这个按钮只在刚被拦住之后才出现。
 
-Done. From now on, just double-click `DesktopDance`; you will not need these steps again.
+## Windows：怎么打开（只有第一次要多点几下）
 
-> Cannot find "Open Anyway"? Go back, double-click `DesktopDance` once more, click Done, and then look in Privacy & Security straight away. The button only appears right after the app has been blocked.
+需要 64 位的 Windows 10 或 Windows 11。
 
-## Windows: how to open it (a few extra clicks, first time only)
+**第 1 步：把下载的文件留下来。** 点了上面的下载按钮后，浏览器有时会拦一下，说这个文件「不常下载」或「可能有风险」。这是正常的：所有没有花钱买微软证书的新软件都会被这样提示，不代表它有问题。
 
-You need 64-bit Windows 10 or Windows 11.
+- 用 **Edge** 浏览器：把鼠标移到这条提示上，点右边的 **「…」** → **「保留」**；如果它又问一次，点 **「显示详细信息」** → **「仍然保留」**。
+- 用 **Chrome** 浏览器：点提示里的 **「保留」**。
 
-**Step 1: Keep the downloaded file.** After you click the download button above, your browser may hold the file back and say it "isn't commonly downloaded" or "may be harmful". This is normal: every new app whose author has not paid Microsoft for a certificate gets this message, and it does not mean anything is wrong.
+没有出现这类提示的话，直接看第 2 步。
 
-- In **Edge**: move the mouse over the message, click **…** on the right → **Keep**; if it asks again, click **Show more** → **Keep anyway**.
-- In **Chrome**: click **Keep** in the message.
+**第 2 步：找到下载好的文件。** 点屏幕下方任务栏里的黄色文件夹图标，在打开的窗口左边点 **「下载」**。里面有一个 `DesktopDance-win.exe`（有的电脑上名字只显示成 `DesktopDance-win`，是同一个文件）。
 
-If no such message appears, go straight to step 2.
+**第 3 步：双击它。** 会弹出一个大窗口（深灰色或蓝色），写着「Windows 已保护你的电脑」。这也是正常的，原因和第 1 步一样。这个窗口乍一看只有一个「不运行」按钮，先别点它：点那段文字下面的小字 **「更多信息」**，窗口下方会多出一个 **「仍要运行」** 按钮，点它。
 
-**Step 2: Find the downloaded file.** Click the yellow folder icon in the taskbar at the bottom of the screen, then click **Downloads** on the left of the window that opens. You will see `DesktopDance-win.exe` (on some computers the name is shown as just `DesktopDance-win`; it is the same file).
+<img src="docs/open-win-1.png" width="420" alt="「Windows 已保护你的电脑」窗口：先点「更多信息」">
 
-**Step 3: Double-click it.** A large window (dark grey or blue) says "Windows protected your PC". This is normal too, for the same reason as in step 1. At first the window only seems to have a "Don't run" button; do not click that. Click the small **More info** link under the text, and a **Run anyway** button appears at the bottom of the window. Click it.
+<img src="docs/open-win-2.png" width="420" alt="再点多出来的「仍要运行」">
 
-<img src="docs/open-win-1-en.png" width="420" alt="The Windows protected your PC window: click More info first">
+有的电脑弹出的不是上面那个窗口，而是下面这个「打开文件 - 安全警告」。意思一样，点 **「运行」** 就行。
 
-<img src="docs/open-win-2-en.png" width="420" alt="Then click the Run anyway button that appears">
+<img src="docs/open-win-warning.png" width="420" alt="「打开文件 - 安全警告」窗口，点「运行」">
 
-On some computers you get the "Open File - Security Warning" window below instead of the one above. It means the same thing; click **Run**.
+**第 4 步：等几秒。** 第一次打开要等几秒钟，然后屏幕**左下角**会出现一个小窗口，标题是 `DesktopDance`。看到它就成功了。
 
-<img src="docs/open-win-warning-en.png" width="420" alt="The Open File - Security Warning window; click Run">
+<img src="docs/open-win-panel.png" width="300" alt="左下角出现的 DesktopDance 小窗口">
 
-**Step 4: Wait a few seconds.** The first start takes a few seconds, then a small window titled `DesktopDance` appears in the **bottom-left** corner of the screen. Once you see it, it worked.
+完成。以后直接双击这个文件就能打开，一般不会再出现这个提示。它不需要安装；想把文件挪到别的地方（比如拖到桌面上）也可以；以后不想要了，直接删掉这个文件就行。
 
-<img src="docs/open-win-panel-en.png" width="300" alt="The small DesktopDance window that appears in the bottom-left corner">
+> 双击之后什么都没出现？先等十秒钟，再看看屏幕最下面的任务栏里有没有 `DesktopDance`。个别杀毒软件会拦没有签名的新软件，如果它弹了提示，选「允许」。还是不行的话请[在这里留言告诉我](https://github.com/FEFKNCQ/Desktop-icon-Dance-CN/issues/new)。
 
-Done. From now on, just double-click the file; this prompt normally does not come back. Nothing is installed; you can move the file somewhere else (for example onto your desktop); and if you no longer want it, just delete the file.
+## 怎么玩
 
-> Nothing appeared after double-clicking? Wait ten seconds, then check the taskbar at the bottom of the screen for `DesktopDance`. Some antivirus programs block new unsigned apps; if yours shows a message, choose "Allow". If it still does not work, please [tell me here](https://github.com/jiafufang63-cpu/DesktopDance/issues/new).
+1. 打开后，屏幕**左下角**会出现一个小窗口。（只有 Mac）刚打开时可能先问两件事：能不能访问「桌面」文件夹、能不能控制「访达」。都点「允许」/「好」，它只是读一下有哪些图标、在什么位置。然后点小窗口里的 **「开始蹦迪」**。
+2. （只有 Mac）第一次会问能不能「录制系统音频」，点 **「允许」**。它需要听到你放的歌才能跟着跳；只是听节拍，不录音、不保存。
+3. 用任何软件放一首歌（音乐软件、视频、网页都行），图标就会跟着动。
+4. **想停下来：按键盘左上角的 `Esc` 键。** 桌面马上恢复原样。
 
-## How to play
+## 常见问题
 
-1. After it opens, a small window appears in the **bottom-left** corner of the screen. (Mac only) Right after opening, it may ask for access to your Desktop folder and to control Finder. Click **Allow** / **OK** for both; it only reads which icons are there and where. Then click **Start**.
-2. (Mac only) The first time, it asks to record system audio. Click **Allow**. It needs to hear your music to follow it; it only listens for the beat and never records or saves anything.
-3. Play a song in any app (a music app, a video, a web page) and the icons start moving to it.
-4. **To stop: press the `Esc` key in the top-left of your keyboard.** Your desktop is back to normal immediately.
+**它会弄乱或者删掉我桌面上的东西吗？**
+不会。它只是在桌面上方「画」出图标的样子让它们动，你真正的文件一直待在原地，没有被移动、改名或删除。就算程序突然崩溃或者电脑死机，重新开机后桌面也是原样。
 
-## Common questions
+**我桌面上没什么东西，也能玩吗？**
+能。图标不够的时候，它会借用你电脑里已安装软件的图标来凑数，只是借来显示，不会在你桌面上多出任何文件。
 
-**Will it mess up or delete things on my desktop?**
-No. It only draws pictures of your icons above the desktop and animates those. Your real files stay exactly where they are; nothing is moved, renamed or deleted. Even if the app crashes or the computer freezes, your desktop is unchanged after a restart.
+**按 `Esc` 没反应怎么办？**
+点小窗口里的「恢复桌面」。还不行就直接关掉那个小窗口，桌面会立刻恢复。
 
-**My desktop is nearly empty. Can I still use it?**
-Yes. When there are too few icons, it borrows the icons of apps installed on your computer, for display only. No files are added to your desktop.
+**放着歌，它却不跟着跳？**
+看一下小窗口里「跟着电脑正在播放的音乐跳」有没有打勾。Mac 上如果一直显示「没听到声音」：系统设置 → 隐私与安全性 → 录屏与系统录音 → 翻到最下面「仅系统录音」，把 DesktopDance 打开。
 
-**`Esc` does nothing. What now?**
-Click **Restore** in the small window. If that fails too, close the small window; the desktop is restored at once.
-
-**Music is playing but it does not follow.**
-Check that **Follow the music playing on this Mac** (on Windows: **…on this PC**) is ticked in the small window. On Mac, if it keeps saying no sound is heard: System Settings → Privacy & Security → Screen & System Audio Recording → scroll to "System Audio Recording Only" at the bottom and turn on DesktopDance.
-
-**How do I remove it?**
-Mac: drag `DesktopDance` to the Trash. Windows: delete `DesktopDance-win.exe`. It installs nothing else on your computer; it leaves only a tiny settings-and-log folder, and [PRIVACY.md](PRIVACY.md) says where.
+**怎么删掉它？**
+Mac：把 `DesktopDance` 拖进废纸篓。Windows：删掉 `DesktopDance-win.exe`。它没有在电脑里安装别的东西，只会留下一个很小的设置和日志文件夹，位置见[隐私说明](PRIVACY.md)。
 
 ---
 
-More detail follows, for people who want to know what every control does or want to change the code. From "Permission prompts" onward it describes the Mac version; the Windows equivalents (safety model, limitations, building) are in [windows/README.md](windows/README.md) (in Chinese). See also the [privacy note](PRIVACY.md).
+下面是更详细的说明，想了解每个按钮、或者想自己改代码的人可以接着看。从「权限弹窗」开始写的是 Mac 版；Windows 版对应的内容（怎么保证桌面不出事、已知限制、从源码构建）在 [windows/README.md](windows/README.md)。另见[隐私说明](PRIVACY.md)。
 
-## What each control in the small window does
+## 小窗口里每个选项是做什么的
 
-| Control | What it does |
+| 控件 | 作用 |
 | --- | --- |
-| Start / Pause / Restore | Start, pause, or send the icons back and remove the stage |
-| Mode | Basketball (default), Line, Groove, Free; tick **Auto switch** to cycle through them |
-| Ball | Which icon plays the basketball in Basketball mode (changes immediately). Default is the first app icon (on Windows: the first icon). The menu lists the icons taking part on your own computer (your desktop files and your installed apps), so everyone sees a different list |
-| Follow the music playing on this Mac (Windows: …on this PC) | On by default; when off or silent, it dances to a built-in 120 BPM beat |
-| Speed / Size / Number | Speed, how big the moves are, and the number of icons (after you let go, the icons regroup with the new number). In Basketball mode, Size is how exaggerated the moves are: the default position is the original motion, higher swings the limbs wider (the figure shrinks a little so nothing leaves the frame) |
-| Names | Show icon names under the icons. Turn it off for cleaner recordings |
-| Hide this window from screenshots / recordings | Keeps the control window out of screenshots and screen recordings (verified with the system screenshot tool; some third-party recorders may ignore this setting) |
-| Language | English or Chinese. Follows the system language the first time and remembers your choice |
+| 开始蹦迪 / 暂停 / 恢复桌面 | 开始、暂停、图标飞回原位并撤掉舞台 |
+| 模式 | 打篮球（默认）、列队、律动、自由；勾「自动切换」会轮流播 |
+| 篮球 | 「打篮球」里用哪个图标当球，选了立刻换。默认用第一个应用图标（Windows 版是第一个图标）。菜单里列的是你这台电脑上场的那些图标（你的桌面文件和你装的应用），每个人看到的都不一样 |
+| 跟着电脑正在播放的音乐跳 | 默认勾上。不勾或没声音时按内置的 120 拍跳 |
+| 速度 / 幅度 / 数量 | 舞步快慢、摆动大小、图标总数（拖完松手，图标会按新数量重新排一次）。打篮球里「幅度」是动作夸张程度：默认位置是原样，越大手脚挥得越开（为了不出画，小人会相应缩小一些） |
+| 图标名称 | 图标下面带不带名字。录视频建议关掉，小人轮廓更干净 |
+| 截屏 / 录屏时隐藏本窗口 | 全屏录制时勾上，控制窗口就不会入镜（系统截图已验证有效；个别第三方录屏工具可能不理会这个设置） |
+| 语言 | 界面用中文还是英文。第一次按系统语言定，改了会记住 |
 
-**Restore at any time: press `Esc`.** You can also click **Restore** or close the control window (on Mac, `Command+Q` works too).
+**随时恢复：按 `Esc`**，也可以点「恢复桌面」或关掉控制窗口（Mac 上还可以按 `Command+Q`）。
 
-The number you set is the number of icons that dance. If your desktop has more, the extra ones stay where they are; if it has fewer, app icons fill in. Changes to number or mode made while paused take effect when you resume.
+「数量」是多少，就有多少个图标跳舞。桌面图标比它多时，多出来的留在原位不动；比它少时，用应用图标补位。暂停时改的数量和模式，会在点「继续」后生效。
 
-The idea comes from "桌面蹦迪" ("Desktop Disco"), a Windows program by LXG. That program is closed-source and has no Mac version; this is an independent implementation written from scratch and uses none of its code.
+创意来自 LXG 的 Windows 软件「桌面蹦迪」。那个软件没有公开源码，也没有 Mac 版；这里是从零写的独立实现，没有使用它的任何代码。
 
-## Permission prompts you may see (Mac)
+## 首次运行可能出现的权限弹窗（Mac）
 
-| Prompt | When | If you decline |
+| 弹窗 | 什么时候出现 | 不给会怎样 |
 | --- | --- | --- |
-| System audio recording | First time you start dancing | It cannot hear music and dances to the built-in beat |
-| Access to the Desktop folder | At launch | It cannot read your desktop icons and uses app icons only |
-| Automation (control Finder) | When the desktop has icons | It cannot read the icons' real positions; copies start from a default grid |
+| 录制系统音频 | 第一次开始跳舞时 | 听不到音乐，按内置节拍跳 |
+| 访问「桌面」文件夹 | 启动时 | 读不到桌面图标，全部用应用图标补位 |
+| 自动化（控制 Finder） | 桌面上有图标时 | 拿不到图标的真实位置，副本从默认网格出发 |
 
-No Accessibility permission is needed. **The app never asks for Screen Recording permission.** The microphone is never used. The app makes no network connections.
+不需要「辅助功能」权限，**不会申请「屏幕录制」权限**，从不使用麦克风，不联网。
 
-If music is playing but the status line keeps saying no sound is heard: System Settings → Privacy & Security → Screen & System Audio Recording → enable DesktopDance under "System Audio Recording Only" at the bottom.
+如果放着歌却一直显示「没听到声音」：系统设置 → 隐私与安全性 → 录屏与系统录音 → 最下面「仅系统录音」里打开 DesktopDance。
 
-## Build from source (Mac)
+## 从源码构建（Mac）
 
-For the Windows version see [windows/README.md](windows/README.md). You only need the Xcode Command Line Tools (`xcode-select --install`), not the full Xcode:
+Windows 版见 [windows/README.md](windows/README.md)。只需要 Xcode 命令行工具（没有的话先 `xcode-select --install`），不需要完整的 Xcode：
 
 ```bash
 ./build.sh
 open build/DesktopDance.app
 ```
 
-To make a universal zip you can hand to other people (`dist/DesktopDance-mac.zip`):
+打一个可以发给别人的通用版压缩包（`dist/DesktopDance-mac.zip`）：
 
 ```bash
 ./release.sh
 ```
 
-A self-built app is ad-hoc signed, and macOS ties permissions to a specific build: after rebuilding, the system may ask again for permissions you already granted.
+自己构建的 app 是临时签名，系统把权限绑在「某一次构建」上：重新构建后，系统可能会把之前给过的权限再问一遍。
 
-## Customising
+## 怎么改
 
-**Lyrics** are off by default. To overlay lyrics at the top, launch with an `.lrc` file: `open build/DesktopDance.app --args --lyrics yours.lrc` (one `[mm:ss.xx]text` per line, see [lyrics/placeholder.lrc](lyrics/placeholder.lrc)). Lyrics loop on their own timeline and are not aligned with the song that is playing. Likewise, `--audio file` plays and follows a local audio file instead of the system audio.
+**歌词**：默认不显示。想在顶部叠歌词，用命令行带一个 `.lrc` 文件启动：`open build/DesktopDance.app --args --lyrics 你的歌词.lrc`，每行 `[分:秒.百分秒]歌词`，参考 [lyrics/placeholder.lrc](lyrics/placeholder.lrc)；歌词按自己的时间表循环，不和正在播的歌对齐。本地音频文件同理：`--audio 文件` 会改为播放并跟随那个文件。
 
-**Formations and moves** all live in [Sources/Choreo.swift](Sources/Choreo.swift), one function per mode:
+**队形和舞步**都在 [Sources/Choreo.swift](Sources/Choreo.swift)，每个模式是一个函数：
 
-| To change | Edit |
+| 想改什么 | 改哪里 |
 | --- | --- |
-| Line (`snake()` in the code): length of the opening column, when it grows, when it bends into an S | `Lshort`, `grow`, `toS` at the top of `snake()` |
-| Line: how long the S and Y shapes hold | the 48-beat `bump(...)` block in `snake()` |
-| Line: number of bends and width of the S | `1.25` / `1.5` (bends) and `0.30` (width) in the two `pS` lines |
-| Line: wave size and tilt | `A`, `tilt` |
-| Basketball: use a different move | see "Where the basketball motion comes from"; re-extract, no code change |
-| Basketball: icons per body part, head size | `weights`, `headR` in `figure()` |
-| Groove: squash and jump height | `sy`, `sx`, `hop` in `groove()` |
-| Free: cluster size and burst distance | `R0`, `burst` in `free()` |
-| Beats per mode when auto-switching | `DanceMode.autoBeats` |
+| 列队：开场小列多长、几拍后拉长、几拍后弯成 S | `snake()` 开头的 `Lshort`、`grow`、`toS` |
+| 列队：S 和 Y 各停多久 | `snake()` 里 48 拍一轮的那段 `bump(...)` |
+| 列队：S 有几道弯、摆多宽 | `pS` 那两行里的 `1.25` / `1.5`（弯数）和 `0.30`（宽度） |
+| 列队：波浪大小、倾斜角度 | `A`、`tilt` |
+| 打篮球：换一段动作 | 见下面「打篮球的动作从哪来」，重新提取即可，不用改代码 |
+| 打篮球：小人各部位分多少图标、头多大 | `figure()` 里的 `weights`、`headR` |
+| 律动：压多扁、跳多高 | `groove()` 里的 `sy`、`sx`、`hop` |
+| 自由：聚成多大一团、弹多远 | `free()` 里的 `R0`、`burst` |
+| 自动切换时每个模式停多少拍 | `DanceMode.autoBeats` |
 
-To add a mode: add a case to `DanceMode`, hook a new function into the `switch` in `poses()`, and have it return a `Pose` (position, rotation, scale) for each icon. The mode menu picks it up automatically.
+新增模式：在 `DanceMode` 里加一个 case，在 `poses()` 的 `switch` 里接上一个新函数，函数返回每个图标的 `Pose`（位置、旋转、缩放）即可，控制窗口的菜单会自动多出一项。
 
-Run `./build.sh` afterwards. To preview formations as images without opening any window:
+改完运行 `./build.sh`。想不开窗口先看队形，可以离屏渲染成图片：
 
 ```bash
 ./build/DesktopDance.app/Contents/MacOS/DesktopDance --render-test /tmp/dance-preview
 ```
 
-## Where the basketball motion comes from
+## 打篮球的动作从哪来
 
-The Basketball mode is not hand-animated. It is **motion capture**: from a full-body video of someone dribbling, macOS's built-in human body pose detection extracts 17 joint positions per frame, the ball is located by colour, and the result is stored in [motion/basketball-motion.json](motion/basketball-motion.json). The figure replays that data in a 16.8-second loop: low dribble → hand switch → ball up to the shoulder → fingertip spin → toss → turn, wide stance, arm out. After the toss, the ball icon fades out and reappears when the loop restarts.
+「打篮球」不是手写的动作，而是**动作捕捉**：从一段全身入镜的运球视频里，用 macOS 自带的人体姿态识别逐帧取出 17 个关节的位置，再按颜色找出篮球，存成 [motion/basketball-motion.json](motion/basketball-motion.json)。小人就是照着这份数据动的，一轮 16.8 秒：低位运球 → 换手 → 球举到肩 → 指尖转球 → 抛球 → 转身、叉腿、伸臂，然后循环。球被抛走后，当球的图标会淡出，回到开头时再出现。
 
-The file contains **joint coordinates only**. It holds no video frames, and no video is included in this repository.
+这个文件里**只有关节坐标**，不含任何视频画面，仓库里也不带视频。
 
-To use another video (a different dance, or yourself):
+想换成别的视频（别的舞、你自己跳的）：
 
 ```bash
-./build/DesktopDance.app/Contents/MacOS/DesktopDance --extract-pose your-video.mp4 motion/basketball-motion.json --sheet /tmp/check.png --from START_SEC --to END_SEC
+./build/DesktopDance.app/Contents/MacOS/DesktopDance --extract-pose 你的视频.mp4 motion/basketball-motion.json --sheet /tmp/check.png --from 起始秒 --to 结束秒
 ```
 
-Then run `./build.sh`. `--sheet` writes a contact sheet with the detected skeleton drawn over the frames so you can check the detection. Requirements: one person, full body in frame, a single camera angle (extract one shot at a time if the video cuts). The video must be H.264 or HEVC; convert VP9 first with `ffmpeg -i in.webm -c:v h264_videotoolbox out.mp4`.
+然后 `./build.sh`。`--sheet` 会生成一张叠了骨架的检查图，用来确认识别得准不准。要求：单人、全身入镜、同一个机位（中途切镜头的话分段提取，或只取一段）。视频要是 H.264/HEVC 编码；VP9 的先用 `ffmpeg -i in.webm -c:v h264_videotoolbox out.mp4` 转一下。
 
-If the data file is missing, a simple hand-written routine (`proceduralSkeleton()`) is used instead.
+找不到这个数据文件时，会退回一套手写的简化动作（`proceduralSkeleton()`）。
 
-## How it keeps your desktop safe
+## 它怎么保证桌面不出事
 
-The app **never moves, hides, renames or deletes a real icon, and never changes any Finder or system setting**. It does one thing: it opens its own full-screen window just above the desktop icon layer and draws copies of the icons in it.
+程序**从不移动、隐藏、改名或删除任何真实图标，也不改任何 Finder 或系统设置**。它做的只有一件事：在桌面图标层正上方开一个属于自己的全屏窗口，在里面画图标的副本。
 
-- When the desktop has real icons, the window first paints the wallpaper over them, then draws the copies, so it looks as if the icons themselves are dancing.
-- When the desktop is empty, the window is fully transparent and the icons dance directly on your real wallpaper.
-- The window exists only inside the app's process. Normal quit, crash, `kill -9`, power loss: once the process is gone, so is the window, and the real desktop is simply there again. There is no persistent state to restore, so `killall Finder` is never needed.
-- While the cover is up, the window intercepts clicks (so you cannot accidentally drag a real icon you cannot see); one click on the desktop stops the dance.
-- Before starting, icon positions and the desktop's stack/sort settings are saved to `~/Library/Application Support/DesktopDance/desktop-snapshot.json`; after stopping they are read again and compared, the result is written to the log, and the status line warns you only if something moved. This is a check only: even if an icon is found in a different place (say you dragged it yourself mid-dance), the app does not write anything back.
-- The log is `desktop-dance.log` in the same folder.
+- 桌面上有真实图标时，窗口先铺一层壁纸把它们盖住，再画副本，看起来就是图标自己在跳。
+- 桌面是空的时，窗口完全透明，直接在真实壁纸上跳。
+- 这个窗口只活在本进程里。正常退出、崩溃、`kill -9` 强杀、断电重启——只要进程没了，窗口就没了，真实桌面原样露出来。不存在「需要恢复」的持久状态，所以也从不需要 `killall Finder`。
+- 有遮罩时窗口会拦截鼠标（免得隔着遮罩误拖看不见的真实图标），点一下桌面就停止。
+- 开始前会把图标坐标和叠放/排列设置存一份快照到 `~/Library/Application Support/DesktopDance/desktop-snapshot.json`，结束后重新读一遍核对，结果写进日志，发现有图标位置变了才在状态行提醒。只核对、不改动：即使发现有图标位置变了（比如你中途自己拖过），程序也不会去「写回」。
+- 日志在同目录的 `desktop-dance.log`。
 
-## Known limitations
+## 已知限制
 
-- **A desktop with icons needs a wallpaper image to cover the real icons.** The app uses the system wallpaper file, which needs no permission. If your wallpaper is drawn by a third-party app (an animated-wallpaper tool), that file will not match what you see on screen; if you want a seamless cover in that case, you can add DesktopDance yourself under System Settings → Privacy & Security → Screen & System Audio Recording, and the app will switch to a live capture once it sees the permission. The app itself never prompts for it.
-- **Animated wallpapers** appear frozen while the cover is up, because the cover is a still image. An empty desktop has no cover and is not affected.
-- `Esc` is captured globally while dancing (so you can always restore), so other apps do not receive `Esc` during that time.
-- Desktop files use the system's QuickLook thumbnails, matching what Finder shows; a file type whose thumbnail is not ready within 1.5 seconds falls back to its generic icon.
-- Multiple displays: the dance runs on the main display only; desktop icons placed on other displays do not join and are left as they are.
-- Basketball mode follows music by **speed**: faster songs make the moves faster, slower songs slower (100 BPM is original speed, changing smoothly between 0.75× and 1.4×), with no per-beat jolt. It does not guarantee that each bounce lands exactly on a beat. The other three modes follow beat by beat.
+- **有图标的桌面需要一张壁纸来盖住真图标**，用的是系统壁纸文件，不需要任何权限。如果你的壁纸是第三方软件画的（动态壁纸软件），壁纸文件会和屏幕上看到的不一样；这种情况下想要无缝，可以自己到 系统设置 → 隐私与安全性 → 录屏与系统录音 里手动加上 DesktopDance，程序发现有权限就会改用实时截取的壁纸。程序自己不会弹窗要这个权限。
+- **动态壁纸**：有遮罩时铺的是一张静止的壁纸截图，动态壁纸在跳舞期间看起来会定住。桌面为空时没有遮罩，不受影响。
+- 跳舞期间 `Esc` 被全局占用（为了随时能恢复），其他程序暂时收不到 `Esc`。
+- 桌面文件用系统的 QuickLook 缩略图（和 Finder 显示的一致）；个别类型 1.5 秒内取不到缩略图时退回通用图标。
+- 多显示器：只在主屏跳；放在其他屏幕上的桌面图标不上场，保持原样。
+- 「打篮球」跟音乐的方式是**快慢**：歌快动作就快，歌慢动作就慢（100 拍为原速，0.75–1.4 倍之间平滑变化），不会在每个鼓点上抖一下。它不保证每次拍球正好踩在鼓点上。列队、律动、自由三个模式是逐拍跟的。
 
-## Test record
+## 自测记录
 
-Most testing was done on one Mac running macOS 27.0.1 (4K at 120 Hz, Apple silicon). In addition, GitHub-hosted machines ran it once each on macOS 15 (Apple silicon), macOS 15 (Intel) and macOS 26 (Apple silicon).
+主要在一台 macOS 27.0.1、4K@120Hz、Apple 芯片的 Mac 上测；另外用 GitHub 的机器在 macOS 15（Apple 芯片）、macOS 15（Intel）、macOS 26（Apple 芯片）上各跑了一遍。
 
-Verified:
+已验证：
 
-- All four modes (off-screen renders plus on-device captures); steady 118–120 fps on device
-- Basketball: 420 frames of motion data, a body detected in every frame, the ball detected in 253 of the 260 frames before the toss; compared frame by frame with the source at 14 moments and every pose matched; no jump at the loop seam
-- Following system audio (Core Audio process tap, needing only the "System Audio Recording Only" permission): connected, heard audio, locked onto the tempo
-- The global `Esc` hotkey restores the desktop; `SIGTERM` restores and exits
-- Logic self-check (`--self-check`, with synthetic data): icons on other displays are kept out, the ball is matched by exact name first, a malformed motion file is rejected instead of crashing, and all four modes lay out anything from 1 to 140 icons
-- Scripted regression runs: changing number and mode while paused (stays paused, applies on resume), changing the number mid-dance, rapidly toggling audio following, and maximum amplitude staying in frame
-- **Real desktop with 28 items** (folders, long names, Chinese/Japanese/emoji names, images, PDF, zip, web link, symlinks): copies line up with the real icons; the cover hides the real icons; all four modes ran; after stopping, the check reported all 28 positions unchanged
-- **Real desktop with 20 items, number set to 12**: 12 danced and the other 8 stayed in place; picking one of the idle icons as the ball swapped it in automatically; raising the number to 30 brought in all 20 plus 10 borrowed app icons; positions unchanged after stopping
-- `kill -9` during a dance: the stage window disappears immediately and every icon's Finder position is identical to before; the next launch detects the unclean exit
-- Cover made from the wallpaper file (the default): it is applied correctly
-- The contents of `~/Desktop` and Finder's desktop settings were never modified
+- 四种模式的队形（离屏渲染 + 真机截图）；真机稳定 118–120 fps
+- 打篮球：动作数据 420 帧，人体全部识别到，篮球在抛出前的 260 帧里识别到 253 帧；和原始画面逐格对比 14 个时刻，姿势全部对得上；循环衔接处无跳变
+- 跟随系统正在播放的声音（Core Audio 进程监听，只需「仅系统录音」权限）：接通、听到声音并锁定节拍
+- `Esc` 全局热键恢复；`SIGTERM` 恢复后退出
+- 逻辑自检（`--self-check`，用造出来的数据）：多显示器时别的屏幕上的图标不上场、选篮球时名字完全相同的优先、坏的动作文件不会让程序崩、1 到 140 个图标四个模式都能排出位置
+- 用脚本模拟操作的回归：暂停时改数量和模式（保持暂停，继续后生效）、跳舞中改数量、连续快速开关「跟着音乐」、幅度拉到最大时不出画
+- **真实桌面，28 个图标**（文件夹、长文件名、中文/日文/emoji 文件名、图片、PDF、压缩包、网址、符号链接）：副本和真图标位置重合；遮罩盖住真图标；四个模式都跑过；停止后复核「28 个图标位置未变」
+- **真实桌面，20 个图标，「数量」设 12**：12 个在跳，其余 8 个留在原位；选一个留在原位的图标当篮球，它会自动换上场；「数量」调到 30 后 20 个全部上场、再借 10 个应用图标；停止后位置未变
+- 跳舞中 `kill -9` 强杀：舞台窗口立即消失，Finder 里每个图标的坐标与之前逐字一致；下次启动能识别上次异常退出
+- 用壁纸文件做遮罩（默认方式）：能正常铺上
+- 全程 `~/Desktop` 内容、Finder 的桌面设置均未被改动
 
-- **Other systems and Intel**: on three GitHub-hosted machines (macOS 15 on Apple silicon, macOS 15 on Intel, macOS 26), building from source, the logic self-check, and a real windowed run that cycles through all four modes, changes the number mid-dance, then stops and restores the desktop all passed. Those machines have an empty desktop and no audio, so this shows the app starts, runs and exits correctly there; nobody looked at the picture or the beat following
+- **其他系统和 Intel**：在 macOS 15（Apple 芯片）、macOS 15（Intel）、macOS 26 三台 GitHub 机器上，从源码构建、逻辑自检、开窗口轮流跳四个模式、中途改数量、停止并恢复桌面，全部通过。这些机器桌面是空的、没有声音，所以只能说明程序能正常启动、运行和退出，画面和跟拍没有人看过
 
-**Not verified**:
+**没能验证**：
 
-- macOS 14 (GitHub no longer offers test machines for it; the declared minimum is 14.2)
-- On Intel Macs and on macOS 15 and 26: covering real desktop icons, and following music
-- Multiple displays (the rule that keeps icons on other displays out of the dance could not be tested without a second display)
-- Automatically reconnecting to audio after the output device changes mid-dance (plugging in headphones)
-- A desktop with "Use Stacks" turned on
-- Whether the cover made from the wallpaper file lines up exactly with the system wallpaper (the test machine's wallpaper is drawn by a third-party app, so there was nothing to compare against)
+- macOS 14（GitHub 已不提供这个版本的测试机器；程序声明的最低要求是 14.2）
+- 在 Intel 的 Mac 和 macOS 15、26 上：有真实桌面图标时的遮盖效果、跟着音乐跳
+- 多显示器（「其他屏幕上的图标不上场」这条逻辑没有第二块屏幕可测）
+- 跳舞中途换输出设备（插拔耳机）后自动重新接上声音
+- 桌面开着「使用叠放」时的表现
+- 壁纸文件做的遮罩和系统壁纸是否完全对齐（测试机的壁纸由第三方软件绘制，没法比对）
 
-If anything looks wrong, press `Esc`; your desktop is not affected. Issues are welcome.
+遇到问题按 `Esc` 即可，桌面不会受影响；欢迎提 issue。
 
-## License
+## 许可证
 
-© 2026 Jennifer Fang. Licensed under [PolyForm Noncommercial 1.0.0](LICENSE): free to use, modify and share for personal and noncommercial purposes, keeping the attribution and license notice; **commercial use of any kind is not permitted** (including selling it, charging for copies, or bundling it into a paid product or service). For a commercial license, open an issue in this repository to contact the author.
+© 2026 Jennifer Fang。采用 [PolyForm Noncommercial 1.0.0](LICENSE) 许可：个人和非商业用途可以免费使用、修改、分享，需保留署名和许可说明；**不允许任何商业用途**（包括出售、收费分发、放进收费产品或服务里）。需要商业授权请在本仓库提 Issue 联系作者。
