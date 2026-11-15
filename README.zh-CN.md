@@ -1,4 +1,4 @@
-[English](README.md) | **中文**
+**中文** | [English](README.en.md)
 
 # 桌面图标跳舞 · DesktopDance
 
@@ -16,15 +16,15 @@
 
 ## 下载
 
-<a href="https://github.com/jiafufang63-cpu/DesktopDance/releases/download/mac-v1.0/DesktopDance-mac.zip"><img src="docs/download-mac.svg" width="260" alt="下载 Mac 版"></a>
+<a href="https://github.com/FEFKNCQ/Desktop-icon-Dance-CN/releases/download/version/DesktopDance-mac.zip"><img src="docs/download-mac.svg" width="260" alt="下载 Mac 版"></a>
 &nbsp;&nbsp;
-<a href="https://github.com/jiafufang63-cpu/DesktopDance/releases/download/win-v1.0/DesktopDance-win.exe"><img src="docs/download-win.svg" width="260" alt="下载 Windows 版"></a>
+<a href="https://github.com/FEFKNCQ/Desktop-icon-Dance-CN/releases/download/version/DesktopDance-win.exe"><img src="docs/download-win.svg" width="260" alt="下载 Windows 版"></a>
 
 点上面的按钮就会开始下载，不用注册、不用登录。
 
 - **不知道自己是哪种电脑？** 屏幕左上角有苹果图标的是 Mac；屏幕下方有四个小方块图标的是 Windows。
 - **Mac** 需要系统是 macOS 14.2 或更新。查看方法：点屏幕左上角的苹果图标 → 「关于本机」。
-- **Windows** 需要 64 位的 Windows 10 或 Windows 11。已在一台 Windows 10 笔记本上亲手测过；每次构建还会在一台和 Windows 11 同一代系统的机器上自动跑一遍（开始、逐项操作、恢复）。还没有人在 Windows 11 电脑上亲手试过，遇到问题请[在这里留言告诉我](https://github.com/jiafufang63-cpu/DesktopDance/issues/new)（需要一个免费的 GitHub 账号）。
+- **Windows** 需要 64 位的 Windows 10 或 Windows 11。已在一台 Windows 10 笔记本上亲手测过；每次构建还会在一台和 Windows 11 同一代系统的机器上自动跑一遍（开始、逐项操作、恢复）。还没有人在 Windows 11 电脑上亲手试过，遇到问题请[在这里留言告诉我](https://github.com/FEFKNCQ/Desktop-icon-Dance-CN/issues/new)（需要一个免费的 GitHub 账号）。
 
 ## Mac：怎么打开（只有第一次要多点几下）
 
@@ -73,7 +73,7 @@
 
 完成。以后直接双击这个文件就能打开，一般不会再出现这个提示。它不需要安装；想把文件挪到别的地方（比如拖到桌面上）也可以；以后不想要了，直接删掉这个文件就行。
 
-> 双击之后什么都没出现？先等十秒钟，再看看屏幕最下面的任务栏里有没有 `DesktopDance`。个别杀毒软件会拦没有签名的新软件，如果它弹了提示，选「允许」。还是不行的话请[在这里留言告诉我](https://github.com/jiafufang63-cpu/DesktopDance/issues/new)。
+> 双击之后什么都没出现？先等十秒钟，再看看屏幕最下面的任务栏里有没有 `DesktopDance`。个别杀毒软件会拦没有签名的新软件，如果它弹了提示，选「允许」。还是不行的话请[在这里留言告诉我](https://github.com/FEFKNCQ/Desktop-icon-Dance-CN/issues/new)。
 
 ## 怎么玩
 
