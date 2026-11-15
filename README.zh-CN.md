@@ -247,3 +247,10 @@ open build/DesktopDance.app
 ## 许可证
 
 © 2026 Jennifer Fang。采用 [PolyForm Noncommercial 1.0.0](LICENSE) 许可：个人和非商业用途可以免费使用、修改、分享，需保留署名和许可说明；**不允许任何商业用途**（包括出售、收费分发、放进收费产品或服务里）。需要商业授权请在本仓库提 Issue 联系作者。
+
+---
+
+## 网盘镜像
+
+- 夸克网盘：https://pan.quark.cn/s/e0643932e6df
+- 百度网盘：https://pan.baidu.com/s/1SftzWSnLxvVajtRb-FCAkg?pwd=7mbu（提取码 7mbu）
