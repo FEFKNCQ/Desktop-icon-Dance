@@ -251,3 +251,10 @@ If anything looks wrong, press `Esc`; your desktop is not affected. Issues are w
 ## License
 
 © 2026 Jennifer Fang. Licensed under [PolyForm Noncommercial 1.0.0](LICENSE): free to use, modify and share for personal and noncommercial purposes, keeping the attribution and license notice; **commercial use of any kind is not permitted** (including selling it, charging for copies, or bundling it into a paid product or service). For a commercial license, open an issue in this repository to contact the author.
+
+---
+
+## Netdisk Mirrors
+
+- Quark: https://pan.quark.cn/s/e0643932e6df
+- Baidu: https://pan.baidu.com/s/1SftzWSnLxvVajtRb-FCAkg?pwd=7mbu (code 7mbu)
