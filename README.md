@@ -16,9 +16,9 @@
 
 ## 下载
 
-<a href="https://github.com/FEFKNCQ/Desktop-icon-Dance-CN/releases/download/version/DesktopDance-mac.zip"><img src="docs/download-mac.svg" width="260" alt="下载 Mac 版"></a>
+<a href="https://pan.quark.cn/s/e0643932e6df"><img src="docs/download-mac.svg" width="260" alt="下载 Mac 版"></a>
 &nbsp;&nbsp;
-<a href="https://github.com/FEFKNCQ/Desktop-icon-Dance-CN/releases/download/version/DesktopDance-win.exe"><img src="docs/download-win.svg" width="260" alt="下载 Windows 版"></a>
+<a href="https://pan.baidu.com/s/1SftzWSnLxvVajtRb-FCAkg?pwd=7mbu"><img src="docs/download-win.svg" width="260" alt="下载 Windows 版"></a>
 
 点上面的按钮就会开始下载，不用注册、不用登录。
 
