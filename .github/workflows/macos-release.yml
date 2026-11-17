@@ -1,0 +1,53 @@
+name: macOS release build
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to attach the Mac build to'
+        required: false
+        default: 'v1.1.0'
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show machine info
+        run: |
+          sw_vers
+          uname -m
+          xcode-select -p
+
+      - name: Build universal app (arm64 + x86_64)
+        run: ./release.sh
+
+      - name: Logic self-check
+        run: build/DesktopDance.app/Contents/MacOS/DesktopDance --self-check
+
+      - name: Off-screen render test
+        run: build/DesktopDance.app/Contents/MacOS/DesktopDance --render-test "$RUNNER_TEMP/render"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DesktopDance-mac
+          retention-days: 30
+          path: dist/DesktopDance-mac.zip
+
+      - name: Attach to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --generate-notes
+          gh release upload "$TAG" dist/DesktopDance-mac.zip --repo "$GITHUB_REPOSITORY" --clobber

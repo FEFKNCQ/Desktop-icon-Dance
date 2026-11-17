@@ -87,7 +87,7 @@ enum SelfTest {
         check("时间戳全相同的动作文件被拒绝而不是崩溃", MotionClip(url: bad) == nil)
         try? FileManager.default.removeItem(at: bad)
 
-        // 四个模式在图标很少、很多时都能排出位置，且都是正常数字
+        // 九个模式在图标很少、很多时都能排出位置，且都是正常数字
         for n in [1, 5, 8, 20, 48, 96, 140] {
             for mode in DanceMode.allCases {
                 let ch = Choreographer()
@@ -107,7 +107,7 @@ enum SelfTest {
                 if !ok { check("\(mode.title) 模式，\(n) 个图标", false) }
             }
         }
-        check("四个模式 × 1 到 140 个图标：都能排出位置", failed == 0)
+        check("九个模式 × 1 到 140 个图标：都能排出位置", failed == 0)
         print(failed == 0 ? "全部通过" : "有 \(failed) 项失败")
         return failed == 0
     }

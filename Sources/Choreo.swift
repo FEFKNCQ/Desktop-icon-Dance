@@ -1,12 +1,17 @@
 import AppKit
 
 enum DanceMode: Int, CaseIterable {
-    case snake, figure, groove, free
+    case figure, shiver, flash, moonwalk, subject3, rehearsal, groove, snake, free
 
     var title: String {
         switch self {
-        case .snake: return T("列队", "Line")
         case .figure: return T("打篮球", "Basketball")
+        case .shiver: return T("狗熊哆嗦毛", "Bear Shiver")
+        case .flash: return T("闪身步", "Flash Step")
+        case .moonwalk: return T("MJ 太空步", "MJ Moonwalk")
+        case .subject3: return T("科目三", "Subject Three")
+        case .rehearsal: return T("测试模式", "Test Reel")
+        case .snake: return T("列队", "Line")
         case .groove: return T("律动", "Groove")
         case .free: return T("自由", "Free")
         }
@@ -15,8 +20,13 @@ enum DanceMode: Int, CaseIterable {
     /// 自动切换时每个模式停留多少拍。
     var autoBeats: Double {
         switch self {
-        case .snake: return 44
         case .figure: return 32
+        case .shiver: return 33.333333333333336
+        case .flash: return 30
+        case .moonwalk: return 40
+        case .subject3: return 36
+        case .rehearsal: return 81.33333333333333
+        case .snake: return 44
         case .groove: return 16
         case .free: return 16
         }
@@ -24,8 +34,13 @@ enum DanceMode: Int, CaseIterable {
 
     static func named(_ s: String) -> DanceMode? {
         switch s.lowercased() {
-        case "snake", "列队": return .snake
         case "figure", "打篮球", "basketball": return .figure
+        case "shiver", "哆嗦毛", "bear shiver": return .shiver
+        case "flash", "闪身步", "flash step": return .flash
+        case "moonwalk", "mj", "太空步", "mj moonwalk": return .moonwalk
+        case "subject3", "科目三", "subject three": return .subject3
+        case "rehearsal", "测试模式", "test reel": return .rehearsal
+        case "snake", "列队": return .snake
         case "groove", "律动": return .groove
         case "free", "自由": return .free
         default: return nil
@@ -40,6 +55,7 @@ struct Tempo {
     var dt: Double
     var energy: Double    // 0...1 音乐强度
     var pulse: Double     // 鼓点脉冲，击中时为 1，随后衰减
+    var accent: F = 0     // 重音强度（哆嗦毛下蹲起伏用）
 }
 
 /// 编舞：给定节拍，算出每个图标该在哪、转多少、压多扁。
@@ -52,13 +68,13 @@ final class Choreographer {
     var grooveUsesHomes = true         // 律动模式：全屏时在原位跳，竖屏时排进舞台
     var ballIndex = 0                  // 打篮球模式里哪个图标当篮球
     private(set) var mode: DanceMode = .snake
-    private var modeBeat0: Double = 0
+    var modeBeat0: Double = 0
 
     // 自由模式的弹簧状态
     private var freePos: [CGPoint] = []
     private var freeVel: [CGPoint] = []
     // 打篮球的状态
-    private var figPhase: Double = 0
+    var figPhase: Double = 0
     private var figInit = false
     private var handA = CGPoint.zero, handP = CGPoint.zero
     private var leanS: F = 0, hipS: F = 0
@@ -78,8 +94,13 @@ final class Choreographer {
     func poses(n: Int, tempo: Tempo) -> [Pose] {
         guard n > 0 else { return [] }
         switch mode {
-        case .snake: return snake(n, tempo)
         case .figure: return figure(n, tempo)
+        case .shiver: return shiver(n, tempo)
+        case .flash: return flash(n, tempo)
+        case .moonwalk: return moonwalk(n, tempo)
+        case .subject3: return subject3(n, tempo)
+        case .rehearsal: return rehearsal(n, tempo)
+        case .snake: return snake(n, tempo)
         case .groove: return groove(n, tempo)
         case .free: return free(n, tempo)
         }
@@ -165,7 +186,7 @@ final class Choreographer {
 
     // MARK: - 打篮球：图标拼成小人，运球 → 过头抛球 → 左右靠，再换另一只手
 
-    private func ik(_ a: CGPoint, _ target: CGPoint, _ l1: F, _ l2: F, bend: F) -> (joint: CGPoint, end: CGPoint) {
+    func ik(_ a: CGPoint, _ target: CGPoint, _ l1: F, _ l2: F, bend: F) -> (joint: CGPoint, end: CGPoint) {
         var d = target - a
         var dist = hypot(d.x, d.y)
         let maxD = (l1 + l2) * 0.999
@@ -177,7 +198,7 @@ final class Choreographer {
         return (CGPoint(x: a.x + ux * aa - uy * h * bend, y: a.y + uy * aa + ux * h * bend), a + d)
     }
 
-    private func samplePolyline(_ pts: [CGPoint], _ t: F) -> CGPoint {
+    func samplePolyline(_ pts: [CGPoint], _ t: F) -> CGPoint {
         guard pts.count > 1 else { return pts.first ?? .zero }
         var lens: [F] = []
         var total: F = 0
@@ -192,7 +213,7 @@ final class Choreographer {
         return pts[pts.count - 1]
     }
 
-    private func allocate(_ total: Int, _ weights: [F]) -> [Int] {
+    func allocate(_ total: Int, _ weights: [F]) -> [Int] {
         let sum = weights.reduce(0, +)
         var counts = weights.map { max(1, Int((F(total) * $0 / sum).rounded())) }
         var guardN = 0
@@ -210,7 +231,7 @@ final class Choreographer {
         return counts
     }
 
-    private func ring(_ n: Int, _ T: Tempo) -> [Pose] {
+    func ring(_ n: Int, _ T: Tempo) -> [Pose] {
         let s = stage
         let r = min(s.width, s.height) * 0.3
         return (0..<n).map { i in
@@ -230,6 +251,8 @@ final class Choreographer {
         var ball: CGPoint
         var lean: F
         var ballAlpha: F = 1
+        var footRotP: F = 0
+        var footRotM: F = 0
     }
 
     /// 动作数据（从参考视频里逐帧提取的关节位置）。有它就照着它跳；没有就用手写动作。
@@ -285,7 +308,7 @@ final class Choreographer {
         return m
     }
     var clipRate: Double = 1
-    private var clipTime: Double = 0
+    var clipTime: Double = 0
 
     private func skeleton(from s: MotionClip.Sample) -> Skeleton {
         func j(_ k: Joint) -> CGPoint { s.joints[k.rawValue] }
