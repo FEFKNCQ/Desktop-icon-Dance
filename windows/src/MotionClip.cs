@@ -5,431 +5,564 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 
-namespace DesktopDance
+namespace DesktopDance;
+
+public sealed class MotionClip
 {
-    public enum Joint
-    {
-        Nose, Neck, LSho, RSho, LElb, RElb, LWri, RWri, Root, LHip, RHip, LKne, RKne, LAnk, RAnk, LEar, REar
-    }
+	public struct Sample
+	{
+		public Vec[] Joints;
 
-    /// <summary>
-    /// 处理好的动作片段：按镜头分段补洞、平滑，换算成「以身高为单位、脚下为原点」的坐标，供小人回放。
-    /// 数据文件 motion/basketball-motion.json 和 Mac 版共用：每帧 17 个关节的 [x, y, 置信度]，
-    /// 坐标是画面归一化坐标（0...1，原点左下，y 向上）。这里是 Mac 版 MotionClip 的逐行移植。
-    /// </summary>
-    public sealed class MotionClip
-    {
-        public const int JointCount = 17;
-        static readonly string[] JointNames =
-        {
-            "nose", "neck", "lsho", "rsho", "lelb", "relb", "lwri", "rwri", "root",
-            "lhip", "rhip", "lkne", "rkne", "lank", "rank", "lear", "rear",
-        };
+		public Vec Ball;
 
-        public struct Sample
-        {
-            public Vec[] Joints;
-            public Vec Ball;
-            public double BallAlpha;
-        }
+		public double BallAlpha;
+	}
 
-        public double Duration { get; }
-        public int FrameCount => count;
-        public double MaxAbsX { get; private set; } = 0.5;
-        public double MaxY { get; private set; } = 1.0;
-        public double MaxRootX { get; private set; }            // 整个人左右走位的最大幅度
-        public double MaxLocalX { get; private set; } = 0.3;    // 肢体（和球）离身体中线最远多少
+	public const int JointCount = 17;
 
-        readonly double dt;
-        readonly int count;
-        readonly Vec[][] tracks;          // [关节][帧]
-        readonly Vec[] ballTrack;
-        readonly double[] ballVisible;    // 0...1
-        readonly int[] cutFrames;         // 每个镜头的第一帧（不含第 0 帧）
+	private static readonly string[] JointNames = new string[17]
+	{
+		"nose", "neck", "lsho", "rsho", "lelb", "relb", "lwri", "rwri", "root", "lhip",
+		"rhip", "lkne", "rkne", "lank", "rank", "lear", "rear"
+	};
 
-        /// <summary>先找 %LocalAppData%\DesktopDance\basketball-motion.json（想换动作的人放这里），没有就用 exe 里自带的。</summary>
-        public static MotionClip? LoadDefault()
-        {
-            try
-            {
-                if (File.Exists(AppPaths.MotionOverride))
-                {
-                    using var fs = File.OpenRead(AppPaths.MotionOverride);
-                    var c = TryParse(fs, "外部文件 " + AppPaths.MotionOverride);
-                    if (c != null) return c;
-                }
-            }
-            catch (Exception ex) { Log.Write("读外部动作数据失败：" + ex.Message); }
-            return LoadEmbedded();
-        }
+	private readonly double dt;
 
-        public static MotionClip? LoadEmbedded()
-        {
-            try
-            {
-                using var s = Assembly.GetExecutingAssembly().GetManifestResourceStream("basketball-motion.json");
-                if (s == null) { Log.Write("exe 里没有找到动作数据"); return null; }
-                return TryParse(s, "内置动作数据");
-            }
-            catch (Exception ex) { Log.Write("读内置动作数据失败：" + ex.Message); return null; }
-        }
+	private readonly int count;
 
-        public static MotionClip? TryParse(Stream stream, string what)
-        {
-            try
-            {
-                using var doc = JsonDocument.Parse(stream);
-                return new MotionClip(doc.RootElement);
-            }
-            catch (Exception ex)
-            {
-                Log.Write(what + " 用不了：" + ex.Message);
-                return null;
-            }
-        }
+	private readonly Vec[][] tracks;
 
-        MotionClip(JsonElement root)
-        {
-            var framesEl = root.GetProperty("frames");
-            int n = framesEl.GetArrayLength();
-            if (n < 8) throw new InvalidDataException("帧数太少");
-            double aspect = root.GetProperty("aspect").GetDouble();
+	private readonly Vec[] ballTrack;
 
-            var ts = new double[n];
-            var J = new Vec?[JointCount][];
-            for (int k = 0; k < JointCount; k++) J[k] = new Vec?[n];
-            var ballRaw = new Vec?[n];
-            int fi = 0;
-            foreach (var f in framesEl.EnumerateArray())
-            {
-                ts[fi] = f.GetProperty("t").GetDouble();
-                if (f.TryGetProperty("j", out var jo) && jo.ValueKind == JsonValueKind.Object)
-                {
-                    for (int k = 0; k < JointCount; k++)
-                    {
-                        if (jo.TryGetProperty(JointNames[k], out var v) && v.ValueKind == JsonValueKind.Array &&
-                            v.GetArrayLength() >= 3 && v[2].GetDouble() > 0.25)
-                        {
-                            J[k][fi] = new Vec(v[0].GetDouble() * aspect, v[1].GetDouble());
-                        }
-                    }
-                }
-                if (f.TryGetProperty("ball", out var b) && b.ValueKind == JsonValueKind.Array &&
-                    b.GetArrayLength() >= 4 && b[3].GetDouble() > 0.3)
-                {
-                    ballRaw[fi] = new Vec(b[0].GetDouble() * aspect, b[1].GetDouble());
-                }
-                fi++;
-            }
+	private readonly double[] ballVisible;
 
-            count = n;
-            double total = ts[n - 1] - ts[0];
-            if (total <= 0) throw new InvalidDataException("时间戳不对");
-            dt = total / (n - 1);
-            Duration = total + dt;
+	private readonly int[] cutFrames;
 
-            // 镜头分段
-            var starts = new List<int> { 0 };
-            if (root.TryGetProperty("cuts", out var cutsEl) && cutsEl.ValueKind == JsonValueKind.Array)
-            {
-                var cuts = new List<double>();
-                foreach (var c in cutsEl.EnumerateArray()) cuts.Add(c.GetDouble());
-                cuts.Sort();
-                foreach (double c in cuts)
-                {
-                    int i = Array.FindIndex(ts, t => t >= c - 1e-6);
-                    if (i >= 0 && i - starts[starts.Count - 1] >= 5 && n - i >= 5) starts.Add(i);
-                }
-            }
-            cutFrames = starts.Skip(1).ToArray();
-            var segs = new List<(int a, int b)>();           // 每段 [a, b)
-            for (int s = 0; s < starts.Count; s++) segs.Add((starts[s], s + 1 < starts.Count ? starts[s + 1] : n));
+	public double Duration { get; }
 
-            // 在一个镜头内，把置信度低的帧用前后好帧线性补上
-            for (int k = 0; k < JointCount; k++)
-                foreach (var (a, b) in segs) Fill(J[k], a, b, int.MaxValue);
+	public int FrameCount => count;
 
-            Vec?[] neckO = J[(int)Joint.Neck], rootO = J[(int)Joint.Root];
-            if (neckO.Any(p => !p.HasValue) || rootO.Any(p => !p.HasValue)) throw new InvalidDataException("脖子或胯的数据不全");
-            Vec[] neck = neckO.Select(p => p!.Value).ToArray();
-            Vec[] rootT = rootO.Select(p => p!.Value).ToArray();
+	public double MaxAbsX { get; private set; } = 0.5;
 
-            // 人离镜头的远近会变。逐帧用骨骼长度估计「他在画面里有多高」：
-            // 骨头正对镜头时会显得短、侧过来才是真实长度，所以取一小段时间里偏大的值，再平滑。
-            var boneRefs = new (Joint a, Joint b, double len)[]
-            {
-                (Joint.Neck, Joint.Root, 0.29), (Joint.LHip, Joint.LKne, 0.245), (Joint.RHip, Joint.RKne, 0.245),
-                (Joint.LKne, Joint.LAnk, 0.246), (Joint.RKne, Joint.RAnk, 0.246),
-                (Joint.LSho, Joint.LElb, 0.172), (Joint.RSho, Joint.RElb, 0.172),
-                (Joint.LElb, Joint.LWri, 0.157), (Joint.RElb, Joint.RWri, 0.157), (Joint.LSho, Joint.RSho, 0.20),
-            };
-            var inst = new double[n];
-            var ratios = new List<double>();
-            for (int i = 0; i < n; i++)
-            {
-                ratios.Clear();
-                foreach (var (ja, jb, len) in boneRefs)
-                {
-                    Vec? p = J[(int)ja][i], q = J[(int)jb][i];
-                    if (p.HasValue && q.HasValue) ratios.Add(M.Hypot(p.Value.X - q.Value.X, p.Value.Y - q.Value.Y) / len);
-                }
-                ratios.Sort((x, y) => y.CompareTo(x));       // 从大到小
-                inst[i] = ratios.Count >= 3 ? ratios[2] : (ratios.Count > 0 ? ratios[ratios.Count - 1] : 0.5);   // 取第三大的，避开个别识别错的骨头
-            }
-            int win = Math.Max(1, (int)M.Round(1.0 / dt));
-            var unit = new double[n];
-            for (int i = 0; i < n; i++)
-            {
-                int lo = Math.Max(0, i - win), hi = Math.Min(n - 1, i + win);
-                var w = new double[hi - lo + 1];
-                Array.Copy(inst, lo, w, 0, w.Length);
-                Array.Sort(w);
-                unit[i] = Math.Max(w[Math.Min(w.Length - 1, w.Length * 8 / 10)], 0.02);
-            }
-            unit = BoxSmooth(unit, win / 2);
+	public double MaxY { get; private set; } = 1.0;
 
-            // 缺失的关节用相邻关节推出来
-            Vec[] Or(Joint j, Func<int, Vec> fb)
-            {
-                var src = J[(int)j];
-                var o = new Vec[n];
-                for (int i = 0; i < n; i++) o[i] = src[i] ?? fb(i);
-                return o;
-            }
-            Vec[] lsho = Or(Joint.LSho, i => new Vec(neck[i].X + unit[i] * 0.09, neck[i].Y));
-            Vec[] rsho = Or(Joint.RSho, i => new Vec(neck[i].X - unit[i] * 0.09, neck[i].Y));
-            Vec[] lelb = Or(Joint.LElb, i => new Vec(lsho[i].X, lsho[i].Y - unit[i] * 0.15));
-            Vec[] relb = Or(Joint.RElb, i => new Vec(rsho[i].X, rsho[i].Y - unit[i] * 0.15));
-            Vec[] lwri = Or(Joint.LWri, i => new Vec(lelb[i].X, lelb[i].Y - unit[i] * 0.15));
-            Vec[] rwri = Or(Joint.RWri, i => new Vec(relb[i].X, relb[i].Y - unit[i] * 0.15));
-            Vec[] lhip = Or(Joint.LHip, i => new Vec(rootT[i].X + unit[i] * 0.05, rootT[i].Y));
-            Vec[] rhip = Or(Joint.RHip, i => new Vec(rootT[i].X - unit[i] * 0.05, rootT[i].Y));
-            Vec[] lkne = Or(Joint.LKne, i => new Vec(lhip[i].X, lhip[i].Y - unit[i] * 0.21));
-            Vec[] rkne = Or(Joint.RKne, i => new Vec(rhip[i].X, rhip[i].Y - unit[i] * 0.21));
-            Vec[] lank = Or(Joint.LAnk, i => new Vec(lkne[i].X, lkne[i].Y - unit[i] * 0.21));
-            Vec[] rank = Or(Joint.RAnk, i => new Vec(rkne[i].X, rkne[i].Y - unit[i] * 0.21));
-            Vec[] nose = Or(Joint.Nose, i => new Vec(neck[i].X, neck[i].Y + unit[i] * 0.11));
-            Vec[] lear = Or(Joint.LEar, i => nose[i]);
-            Vec[] rear = Or(Joint.REar, i => nose[i]);
+	public double MaxRootX { get; private set; }
 
-            // 顺序必须和 Joint 枚举一致
-            var all = new Vec[JointCount][];
-            all[(int)Joint.Nose] = nose; all[(int)Joint.Neck] = neck; all[(int)Joint.LSho] = lsho; all[(int)Joint.RSho] = rsho;
-            all[(int)Joint.LElb] = lelb; all[(int)Joint.RElb] = relb; all[(int)Joint.LWri] = lwri; all[(int)Joint.RWri] = rwri;
-            all[(int)Joint.Root] = rootT; all[(int)Joint.LHip] = lhip; all[(int)Joint.RHip] = rhip; all[(int)Joint.LKne] = lkne;
-            all[(int)Joint.RKne] = rkne; all[(int)Joint.LAnk] = lank; all[(int)Joint.RAnk] = rank; all[(int)Joint.LEar] = lear;
-            all[(int)Joint.REar] = rear;
+	public double MaxLocalX { get; private set; } = 0.3;
 
-            // 篮球：短暂丢失（≤ 8 帧）插值补上；长时间没有就算「球不在了」
-            foreach (var (a, b) in segs) Fill(ballRaw, a, b, 8);
-            var vis = new double[n];
-            var ball = new Vec[n];
-            for (int i = 0; i < n; i++)
-            {
-                vis[i] = ballRaw[i].HasValue ? 1 : 0;
-                ball[i] = ballRaw[i] ?? new Vec(rwri[i].X, rwri[i].Y - unit[i] * 0.07);
-            }
-            // 球不在时的占位：沿用最后一次看到的位置，淡出时不会瞬移
-            Vec? lastSeen = null;
-            for (int i = 0; i < n; i++)
-            {
-                if (ballRaw[i].HasValue) lastSeen = ball[i];
-                else if (lastSeen.HasValue) ball[i] = lastSeen.Value;
-            }
-            // 可见性做 4 帧的淡入淡出
-            var visS = new double[n];
-            for (int i = 0; i < n; i++)
-            {
-                double s = 0;
-                for (int k = -2; k <= 2; k++) s += vis[Math.Min(Math.Max(i + k, 0), n - 1)];
-                visS[i] = s / 5;
-            }
-            vis = visS;
+	public static MotionClip? LoadDefault()
+	{
+		try
+		{
+			if (File.Exists(AppPaths.MotionOverride))
+			{
+				using FileStream stream = File.OpenRead(AppPaths.MotionOverride);
+				MotionClip motionClip = TryParse(stream, "外部文件 " + AppPaths.MotionOverride);
+				if (motionClip != null)
+				{
+					return motionClip;
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			Log.Write("读外部动作数据失败：" + ex.Message);
+		}
+		return LoadEmbedded();
+	}
 
-            // 平滑（手腕脚踝动得快，少平滑一点，保住动作的脆劲）
-            for (int k = 0; k < JointCount; k++)
-            {
-                var jn = (Joint)k;
-                bool quick = jn == Joint.LWri || jn == Joint.RWri || jn == Joint.LAnk || jn == Joint.RAnk;
-                foreach (var (a, b) in segs) all[k] = Smoothed(all[k], a, b, quick ? 1 : 2);
-            }
-            foreach (var (a, b) in segs) ball = Smoothed(ball, a, b, 1);
+	public static MotionClip? LoadEmbedded()
+	{
+		try
+		{
+			using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("basketball-motion.json");
+			if (stream == null)
+			{
+				Log.Write("exe 里没有找到动作数据");
+				return null;
+			}
+			return TryParse(stream, "内置动作数据");
+		}
+		catch (Exception ex)
+		{
+			Log.Write("读内置动作数据失败：" + ex.Message);
+			return null;
+		}
+	}
 
-            // 地面：一小段时间里脚踝的最低处（跳起来时地面不跟着上去），再平滑
-            var ankleMin = new double[n];
-            for (int i = 0; i < n; i++) ankleMin[i] = Math.Min(all[(int)Joint.LAnk][i].Y, all[(int)Joint.RAnk][i].Y);
-            var ground = new double[n];
-            for (int i = 0; i < n; i++)
-            {
-                double m = double.MaxValue;
-                for (int k = Math.Max(0, i - win); k <= Math.Min(n - 1, i + win); k++) m = Math.Min(m, ankleMin[k]);
-                ground[i] = m;
-            }
-            ground = BoxSmooth(ground, win / 2);
-            // 注意：这里用的是平滑前的胯（和 Mac 版一致）
-            double centerX = neckO.Length > 0 ? rootO.Select(p => p!.Value.X).OrderBy(x => x).ElementAt(n / 2) : 0;
+	public static MotionClip? TryParse(Stream stream, string what)
+	{
+		try
+		{
+			using JsonDocument jsonDocument = JsonDocument.Parse(stream);
+			return new MotionClip(jsonDocument.RootElement);
+		}
+		catch (Exception ex)
+		{
+			Log.Write(what + " 用不了：" + ex.Message);
+			return null;
+		}
+	}
 
-            for (int i = 0; i < n; i++)
-            {
-                double u = unit[i], gy = ground[i] - u * 0.03;
-                for (int k = 0; k < JointCount; k++)
-                    all[k][i] = new Vec((all[k][i].X - centerX) / u, (all[k][i].Y - gy) / u);
-                ball[i] = new Vec((ball[i].X - centerX) / u, (ball[i].Y - gy) / u);
-            }
+	private MotionClip(JsonElement root)
+	{
+		JsonElement property = root.GetProperty("frames");
+		int n = property.GetArrayLength();
+		if (n < 8)
+		{
+			throw new InvalidDataException("帧数太少");
+		}
+		double num = root.GetProperty("aspect").GetDouble();
+		double[] array = new double[n];
+		Vec?[][] J = new Vec?[17][];
+		for (int i = 0; i < 17; i++)
+		{
+			J[i] = new Vec?[n];
+		}
+		Vec?[] array2 = new Vec?[n];
+		int num2 = 0;
+		foreach (JsonElement item6 in property.EnumerateArray())
+		{
+			array[num2] = item6.GetProperty("t").GetDouble();
+			if (item6.TryGetProperty("j", out var value) && value.ValueKind == JsonValueKind.Object)
+			{
+				for (int j = 0; j < 17; j++)
+				{
+					if (value.TryGetProperty(JointNames[j], out var value2) && value2.ValueKind == JsonValueKind.Array && value2.GetArrayLength() >= 3 && value2[2].GetDouble() > 0.25)
+					{
+						J[j][num2] = new Vec(value2[0].GetDouble() * num, value2[1].GetDouble());
+					}
+				}
+			}
+			if (item6.TryGetProperty("ball", out var value3) && value3.ValueKind == JsonValueKind.Array && value3.GetArrayLength() >= 4 && value3[3].GetDouble() > 0.3)
+			{
+				array2[num2] = new Vec(value3[0].GetDouble() * num, value3[1].GetDouble());
+			}
+			num2++;
+		}
+		count = n;
+		double num3 = array[n - 1] - array[0];
+		if (num3 <= 0.0)
+		{
+			throw new InvalidDataException("时间戳不对");
+		}
+		dt = num3 / (double)(n - 1);
+		Duration = num3 + dt;
+		List<int> list = new List<int> { 0 };
+		if (root.TryGetProperty("cuts", out var value4) && value4.ValueKind == JsonValueKind.Array)
+		{
+			List<double> list2 = new List<double>();
+			foreach (JsonElement item7 in value4.EnumerateArray())
+			{
+				list2.Add(item7.GetDouble());
+			}
+			list2.Sort();
+			foreach (double c in list2)
+			{
+				int num4 = Array.FindIndex(array, (double t) => t >= c - 1E-06);
+				if (num4 >= 0 && num4 - list[list.Count - 1] >= 5 && n - num4 >= 5)
+				{
+					list.Add(num4);
+				}
+			}
+		}
+		cutFrames = list.Skip(1).ToArray();
+		List<(int, int)> list3 = new List<(int, int)>();
+		for (int num5 = 0; num5 < list.Count; num5++)
+		{
+			list3.Add((list[num5], (num5 + 1 < list.Count) ? list[num5 + 1] : n));
+		}
+		for (int num6 = 0; num6 < 17; num6++)
+		{
+			foreach (var (a, b) in list3)
+			{
+				Fill(J[num6], a, b, int.MaxValue);
+			}
+		}
+		Vec?[] array3 = J[1];
+		Vec?[] source = J[8];
+		if (array3.Any((Vec? p) => !p.HasValue) || source.Any((Vec? p) => !p.HasValue))
+		{
+			throw new InvalidDataException("脖子或胯的数据不全");
+		}
+		Vec[] neck = array3.Select((Vec? p) => p.Value).ToArray();
+		Vec[] rootT = source.Select((Vec? p) => p.Value).ToArray();
+		(Joint, Joint, double)[] array4 = new(Joint, Joint, double)[10]
+		{
+			(Joint.Neck, Joint.Root, 0.29),
+			(Joint.LHip, Joint.LKne, 0.245),
+			(Joint.RHip, Joint.RKne, 0.245),
+			(Joint.LKne, Joint.LAnk, 0.246),
+			(Joint.RKne, Joint.RAnk, 0.246),
+			(Joint.LSho, Joint.LElb, 0.172),
+			(Joint.RSho, Joint.RElb, 0.172),
+			(Joint.LElb, Joint.LWri, 0.157),
+			(Joint.RElb, Joint.RWri, 0.157),
+			(Joint.LSho, Joint.RSho, 0.2)
+		};
+		double[] array5 = new double[n];
+		List<double> list4 = new List<double>();
+		for (int num7 = 0; num7 < n; num7++)
+		{
+			list4.Clear();
+			(Joint, Joint, double)[] array6 = array4;
+			for (int num8 = 0; num8 < array6.Length; num8++)
+			{
+				(Joint, Joint, double) tuple2 = array6[num8];
+				Joint item = tuple2.Item1;
+				Joint item2 = tuple2.Item2;
+				double item3 = tuple2.Item3;
+				Vec? vec = J[(int)item][num7];
+				Vec? vec2 = J[(int)item2][num7];
+				if (vec.HasValue && vec2.HasValue)
+				{
+					list4.Add(M.Hypot(vec.Value.X - vec2.Value.X, vec.Value.Y - vec2.Value.Y) / item3);
+				}
+			}
+			list4.Sort((double x, double y) => y.CompareTo(x));
+			array5[num7] = ((list4.Count >= 3) ? list4[2] : ((list4.Count > 0) ? list4[list4.Count - 1] : 0.5));
+		}
+		int num9 = Math.Max(1, (int)M.Round(1.0 / dt));
+		double[] unit = new double[n];
+		for (int num10 = 0; num10 < n; num10++)
+		{
+			int num11 = Math.Max(0, num10 - num9);
+			double[] array7 = new double[Math.Min(n - 1, num10 + num9) - num11 + 1];
+			Array.Copy(array5, num11, array7, 0, array7.Length);
+			Array.Sort(array7);
+			unit[num10] = Math.Max(array7[Math.Min(array7.Length - 1, array7.Length * 8 / 10)], 0.02);
+		}
+		unit = BoxSmooth(unit, num9 / 2);
+		Vec[] lsho = Or(Joint.LSho, (int num39) => new Vec(neck[num39].X + unit[num39] * 0.09, neck[num39].Y));
+		Vec[] rsho = Or(Joint.RSho, (int num39) => new Vec(neck[num39].X - unit[num39] * 0.09, neck[num39].Y));
+		Vec[] lelb = Or(Joint.LElb, (int num39) => new Vec(lsho[num39].X, lsho[num39].Y - unit[num39] * 0.15));
+		Vec[] relb = Or(Joint.RElb, (int num39) => new Vec(rsho[num39].X, rsho[num39].Y - unit[num39] * 0.15));
+		Vec[] array8 = Or(Joint.LWri, (int num39) => new Vec(lelb[num39].X, lelb[num39].Y - unit[num39] * 0.15));
+		Vec[] array9 = Or(Joint.RWri, (int num39) => new Vec(relb[num39].X, relb[num39].Y - unit[num39] * 0.15));
+		Vec[] lhip = Or(Joint.LHip, (int num39) => new Vec(rootT[num39].X + unit[num39] * 0.05, rootT[num39].Y));
+		Vec[] rhip = Or(Joint.RHip, (int num39) => new Vec(rootT[num39].X - unit[num39] * 0.05, rootT[num39].Y));
+		Vec[] lkne = Or(Joint.LKne, (int num39) => new Vec(lhip[num39].X, lhip[num39].Y - unit[num39] * 0.21));
+		Vec[] rkne = Or(Joint.RKne, (int num39) => new Vec(rhip[num39].X, rhip[num39].Y - unit[num39] * 0.21));
+		Vec[] array10 = Or(Joint.LAnk, (int num39) => new Vec(lkne[num39].X, lkne[num39].Y - unit[num39] * 0.21));
+		Vec[] array11 = Or(Joint.RAnk, (int num39) => new Vec(rkne[num39].X, rkne[num39].Y - unit[num39] * 0.21));
+		Vec[] nose = Or(Joint.Nose, (int num39) => new Vec(neck[num39].X, neck[num39].Y + unit[num39] * 0.11));
+		Vec[] array12 = Or(Joint.LEar, (int num39) => nose[num39]);
+		Vec[] array13 = Or(Joint.REar, (int num39) => nose[num39]);
+		Vec[][] array14 = new Vec[17][]
+		{
+			nose, neck, lsho, rsho, lelb, relb, array8, array9, rootT, lhip,
+			rhip, lkne, rkne, array10, array11, array12, array13
+		};
+		foreach (var (a2, b2) in list3)
+		{
+			Fill(array2, a2, b2, 8);
+		}
+		double[] array15 = new double[n];
+		Vec[] array16 = new Vec[n];
+		for (int num12 = 0; num12 < n; num12++)
+		{
+			array15[num12] = (array2[num12].HasValue ? 1 : 0);
+			array16[num12] = array2[num12] ?? new Vec(array9[num12].X, array9[num12].Y - unit[num12] * 0.07);
+		}
+		Vec? vec3 = null;
+		for (int num13 = 0; num13 < n; num13++)
+		{
+			if (array2[num13].HasValue)
+			{
+				vec3 = array16[num13];
+			}
+			else if (vec3.HasValue)
+			{
+				array16[num13] = vec3.Value;
+			}
+		}
+		double[] array17 = new double[n];
+		for (int num14 = 0; num14 < n; num14++)
+		{
+			double num15 = 0.0;
+			for (int num16 = -2; num16 <= 2; num16++)
+			{
+				num15 += array15[Math.Min(Math.Max(num14 + num16, 0), n - 1)];
+			}
+			array17[num14] = num15 / 5.0;
+		}
+		array15 = array17;
+		for (int num17 = 0; num17 < 17; num17++)
+		{
+			Joint joint = (Joint)num17;
+			bool flag = joint == Joint.LWri || joint == Joint.RWri || joint == Joint.LAnk || joint == Joint.RAnk;
+			foreach (var (a3, b3) in list3)
+			{
+				array14[num17] = Smoothed(array14[num17], a3, b3, flag ? 1 : 2);
+			}
+		}
+		foreach (var item8 in list3)
+		{
+			int item4 = item8.Item1;
+			int item5 = item8.Item2;
+			array16 = Smoothed(array16, item4, item5, 1);
+		}
+		double[] array18 = new double[n];
+		for (int num18 = 0; num18 < n; num18++)
+		{
+			array18[num18] = Math.Min(array14[13][num18].Y, array14[14][num18].Y);
+		}
+		double[] array19 = new double[n];
+		for (int num19 = 0; num19 < n; num19++)
+		{
+			double num20 = double.MaxValue;
+			for (int num21 = Math.Max(0, num19 - num9); num21 <= Math.Min(n - 1, num19 + num9); num21++)
+			{
+				num20 = Math.Min(num20, array18[num21]);
+			}
+			array19[num19] = num20;
+		}
+		array19 = BoxSmooth(array19, num9 / 2);
+		double num22 = ((array3.Length != 0) ? (from p in source
+			select p.Value.X into x
+			orderby x
+			select x).ElementAt(n / 2) : 0.0);
+		for (int num23 = 0; num23 < n; num23++)
+		{
+			double num24 = unit[num23];
+			double num25 = array19[num23] - num24 * 0.03;
+			for (int num26 = 0; num26 < 17; num26++)
+			{
+				array14[num26][num23] = new Vec((array14[num26][num23].X - num22) / num24, (array14[num26][num23].Y - num25) / num24);
+			}
+			array16[num23] = new Vec((array16[num23].X - num22) / num24, (array16[num23].Y - num25) / num24);
+		}
+		double[] array20 = new double[n];
+		for (int num27 = 0; num27 < n; num27++)
+		{
+			array20[num27] = (array14[0][num27].Y + array14[15][num27].Y + array14[16][num27].Y) / 3.0;
+		}
+		double num28 = Pct(array20, 0.9) + 0.085;
+		if (num28 > 0.3)
+		{
+			double num29 = 1.0 / num28;
+			for (int num30 = 0; num30 < 17; num30++)
+			{
+				for (int num31 = 0; num31 < n; num31++)
+				{
+					array14[num30][num31] = array14[num30][num31] * num29;
+				}
+			}
+			for (int num32 = 0; num32 < n; num32++)
+			{
+				array16[num32] *= num29;
+			}
+		}
+		tracks = array14;
+		ballTrack = array16;
+		ballVisible = array15;
+		Vec[] array21 = tracks[8];
+		double[] array22 = new double[n];
+		double[] array23 = new double[n];
+		double[] array24 = new double[n];
+		double num33 = 0.0;
+		for (int num34 = 0; num34 < n; num34++)
+		{
+			double num35 = 0.0;
+			double num36 = 0.0;
+			double num37 = 0.0;
+			for (int num38 = 0; num38 < 17; num38++)
+			{
+				Vec vec4 = tracks[num38][num34];
+				num35 = Math.Max(num35, vec4.Y);
+				num36 = Math.Max(num36, Math.Abs(vec4.X - array21[num34].X));
+				num37 = Math.Max(num37, Math.Abs(vec4.X));
+			}
+			if (array15[num34] > 0.5)
+			{
+				num36 = Math.Max(num36, Math.Abs(array16[num34].X - array21[num34].X));
+				num37 = Math.Max(num37, Math.Abs(array16[num34].X));
+			}
+			array22[num34] = num35;
+			array23[num34] = num36;
+			array24[num34] = num37;
+			num33 = Math.Max(num33, Math.Abs(array21[num34].X));
+		}
+		MaxY = Math.Max(array22.Max(), 1.0) + 0.1;
+		MaxAbsX = Pct(array24, 0.97) + 0.08;
+		MaxLocalX = Pct(array23, 0.97) + 0.08;
+		MaxRootX = num33;
+		Vec[] Or(Joint joint2, Func<int, Vec> fb)
+		{
+			Vec?[] array25 = J[(int)joint2];
+			Vec[] array26 = new Vec[n];
+			for (int k = 0; k < n; k++)
+			{
+				array26[k] = array25[k] ?? fb(k);
+			}
+			return array26;
+		}
+	}
 
-            // 校准：让「站直时的头顶」正好是 1 个身高
-            var headY = new double[n];
-            for (int i = 0; i < n; i++)
-                headY[i] = (all[(int)Joint.Nose][i].Y + all[(int)Joint.LEar][i].Y + all[(int)Joint.REar][i].Y) / 3;
-            double standing = Pct(headY, 0.9) + 0.085;
-            if (standing > 0.3)
-            {
-                double c = 1 / standing;
-                for (int k = 0; k < JointCount; k++)
-                    for (int i = 0; i < n; i++) all[k][i] = all[k][i] * c;
-                for (int i = 0; i < n; i++) ball[i] = ball[i] * c;
-            }
-            tracks = all;
-            ballTrack = ball;
-            ballVisible = vis;
+	private static void Fill(Vec?[] pts, int a, int b, int maxGap)
+	{
+		List<int> list = new List<int>();
+		for (int i = a; i < b; i++)
+		{
+			if (pts[i].HasValue)
+			{
+				list.Add(i);
+			}
+		}
+		if (list.Count == 0)
+		{
+			return;
+		}
+		Vec?[] array = (Vec?[])pts.Clone();
+		for (int j = a; j < b; j++)
+		{
+			if (array[j].HasValue)
+			{
+				continue;
+			}
+			int num = -1;
+			int num2 = -1;
+			foreach (int item in list)
+			{
+				if (item < j)
+				{
+					num = item;
+				}
+				else if (item > j)
+				{
+					num2 = item;
+					break;
+				}
+			}
+			if (num >= 0 && num2 >= 0)
+			{
+				if (num2 - num - 1 <= maxGap)
+				{
+					pts[j] = M.Lerp(array[num].Value, array[num2].Value, (double)(j - num) / (double)(num2 - num));
+				}
+			}
+			else if (maxGap == int.MaxValue)
+			{
+				pts[j] = array[(num >= 0) ? num : num2];
+			}
+		}
+	}
 
-            // 舞台缩放用的幅度。最高点取真实最大值（跳起来不能出框）；横向和球取常态幅度。
-            var rootX = tracks[(int)Joint.Root];
-            var topY = new double[n];
-            var localX = new double[n];
-            var absX = new double[n];
-            double rx = 0;
-            for (int i = 0; i < n; i++)
-            {
-                double ty = 0, lx = 0, ax = 0;
-                for (int k = 0; k < JointCount; k++)
-                {
-                    var p = tracks[k][i];
-                    ty = Math.Max(ty, p.Y);
-                    lx = Math.Max(lx, Math.Abs(p.X - rootX[i].X));
-                    ax = Math.Max(ax, Math.Abs(p.X));
-                }
-                if (vis[i] > 0.5)
-                {
-                    lx = Math.Max(lx, Math.Abs(ball[i].X - rootX[i].X));
-                    ax = Math.Max(ax, Math.Abs(ball[i].X));
-                }
-                topY[i] = ty; localX[i] = lx; absX[i] = ax;
-                rx = Math.Max(rx, Math.Abs(rootX[i].X));
-            }
-            MaxY = Math.Max(topY.Max(), 1.0) + 0.10;
-            MaxAbsX = Pct(absX, 0.97) + 0.08;
-            MaxLocalX = Pct(localX, 0.97) + 0.08;
-            MaxRootX = rx;
-        }
+	private static Vec[] Smoothed(Vec[] t, int a, int b, int radius)
+	{
+		Vec[] array = (Vec[])t.Clone();
+		if (radius <= 0)
+		{
+			return array;
+		}
+		for (int i = a; i < b; i++)
+		{
+			double num = 0.0;
+			double num2 = 0.0;
+			double num3 = 0.0;
+			for (int j = -radius; j <= radius; j++)
+			{
+				int num4 = Math.Min(Math.Max(i + j, a), b - 1);
+				double num5 = radius + 1 - Math.Abs(j);
+				num += t[num4].X * num5;
+				num2 += t[num4].Y * num5;
+				num3 += num5;
+			}
+			array[i] = new Vec(num / num3, num2 / num3);
+		}
+		return array;
+	}
 
-        /// <summary>把 [a, b) 里缺的点用前后好点线性补上。maxGap = int.MaxValue 时，头尾缺的也用最近的好点顶上。</summary>
-        static void Fill(Vec?[] pts, int a, int b, int maxGap)
-        {
-            var good = new List<int>();
-            for (int i = a; i < b; i++) if (pts[i].HasValue) good.Add(i);
-            if (good.Count == 0) return;
-            var src = (Vec?[])pts.Clone();                   // 查找只看原始数据，不看刚补上的
-            for (int i = a; i < b; i++)
-            {
-                if (src[i].HasValue) continue;
-                int before = -1, after = -1;
-                foreach (int g in good)
-                {
-                    if (g < i) before = g;
-                    else if (g > i) { after = g; break; }
-                }
-                if (before >= 0 && after >= 0)
-                {
-                    if (after - before - 1 <= maxGap)
-                        pts[i] = M.Lerp(src[before]!.Value, src[after]!.Value, (double)(i - before) / (after - before));
-                }
-                else if (maxGap == int.MaxValue)
-                {
-                    pts[i] = src[before >= 0 ? before : after];
-                }
-            }
-        }
+	private static double[] BoxSmooth(double[] v, int r)
+	{
+		double[] array = new double[v.Length];
+		for (int i = 0; i < v.Length; i++)
+		{
+			int num = Math.Max(0, i - r);
+			int num2 = Math.Min(v.Length - 1, i + r);
+			double num3 = 0.0;
+			for (int j = num; j <= num2; j++)
+			{
+				num3 += v[j];
+			}
+			array[i] = num3 / (double)(num2 - num + 1);
+		}
+		return array;
+	}
 
-        static Vec[] Smoothed(Vec[] t, int a, int b, int radius)
-        {
-            var o = (Vec[])t.Clone();
-            if (radius <= 0) return o;
-            for (int i = a; i < b; i++)
-            {
-                double sx = 0, sy = 0, wsum = 0;
-                for (int k = -radius; k <= radius; k++)
-                {
-                    int j = Math.Min(Math.Max(i + k, a), b - 1);
-                    double w = radius + 1 - Math.Abs(k);
-                    sx += t[j].X * w; sy += t[j].Y * w; wsum += w;
-                }
-                o[i] = new Vec(sx / wsum, sy / wsum);
-            }
-            return o;
-        }
+	private static double Pct(double[] v, double p)
+	{
+		double[] array = (double[])v.Clone();
+		Array.Sort(array);
+		return array[Math.Min(array.Length - 1, (int)((double)array.Length * p))];
+	}
 
-        static double[] BoxSmooth(double[] v, int r)
-        {
-            var o = new double[v.Length];
-            for (int i = 0; i < v.Length; i++)
-            {
-                int lo = Math.Max(0, i - r), hi = Math.Min(v.Length - 1, i + r);
-                double s = 0;
-                for (int k = lo; k <= hi; k++) s += v[k];
-                o[i] = s / (hi - lo + 1);
-            }
-            return o;
-        }
+	private Sample Frame(double f)
+	{
+		double num = Math.Min(Math.Max(f, 0.0), count - 1);
+		int num2 = (int)num;
+		int num3 = Math.Min(num2 + 1, count - 1);
+		if (Array.IndexOf(cutFrames, num3) >= 0)
+		{
+			num3 = num2;
+		}
+		double t = num - (double)num2;
+		Vec[] array = new Vec[17];
+		for (int i = 0; i < 17; i++)
+		{
+			array[i] = M.Lerp(tracks[i][num2], tracks[i][num3], t);
+		}
+		return new Sample
+		{
+			Joints = array,
+			Ball = M.Lerp(ballTrack[num2], ballTrack[num3], t),
+			BallAlpha = M.Lerp(ballVisible[num2], ballVisible[num3], t)
+		};
+	}
 
-        static double Pct(double[] v, double p)
-        {
-            var s = (double[])v.Clone();
-            Array.Sort(s);
-            return s[Math.Min(s.Length - 1, (int)(s.Length * p))];
-        }
+	private static Sample Blend(Sample a, Sample b, double w)
+	{
+		Vec ball = ((a.BallAlpha < 0.05) ? b.Ball : ((b.BallAlpha < 0.05) ? a.Ball : M.Lerp(a.Ball, b.Ball, w)));
+		Vec[] array = new Vec[17];
+		for (int i = 0; i < 17; i++)
+		{
+			array[i] = M.Lerp(a.Joints[i], b.Joints[i], w);
+		}
+		return new Sample
+		{
+			Joints = array,
+			Ball = ball,
+			BallAlpha = M.Lerp(a.BallAlpha, b.BallAlpha, w)
+		};
+	}
 
-        Sample Frame(double f)
-        {
-            double ff = Math.Min(Math.Max(f, 0), count - 1);
-            int i = (int)ff;
-            int j = Math.Min(i + 1, count - 1);
-            if (Array.IndexOf(cutFrames, j) >= 0) j = i;     // 不跨镜头插值
-            double k = ff - i;
-            var joints = new Vec[JointCount];
-            for (int q = 0; q < JointCount; q++) joints[q] = M.Lerp(tracks[q][i], tracks[q][j], k);
-            return new Sample
-            {
-                Joints = joints,
-                Ball = M.Lerp(ballTrack[i], ballTrack[j], k),
-                BallAlpha = M.Lerp(ballVisible[i], ballVisible[j], k),
-            };
-        }
-
-        static Sample Blend(Sample a, Sample b, double w)
-        {
-            // 球：哪一边看不见，就直接用看得见那一边的位置（否则球会从被抛走的地方飘回来）
-            Vec ball = a.BallAlpha < 0.05 ? b.Ball : (b.BallAlpha < 0.05 ? a.Ball : M.Lerp(a.Ball, b.Ball, w));
-            var joints = new Vec[JointCount];
-            for (int q = 0; q < JointCount; q++) joints[q] = M.Lerp(a.Joints[q], b.Joints[q], w);
-            return new Sample { Joints = joints, Ball = ball, BallAlpha = M.Lerp(a.BallAlpha, b.BallAlpha, w) };
-        }
-
-        /// <summary>取 t 秒时的姿态。循环播放；镜头切换处和首尾相接处用 0.2 秒过渡。</summary>
-        public Sample SampleAt(double time)
-        {
-            double t = time % Duration;
-            if (t < 0) t += Duration;
-            double f = t / dt;
-            Sample cur = Frame(f);
-            double blendFrames = 0.2 / dt;
-            int cut = -1;
-            foreach (int c in cutFrames) if (c <= f) cut = c;
-            if (cut >= 0 && f - cut < blendFrames)
-                return Blend(Frame(cut - 1), cur, M.Smooth((f - cut) / blendFrames));
-            if (t > Duration - 0.2)
-                return Blend(cur, Frame(0), M.Smooth((t - (Duration - 0.2)) / 0.2));
-            return cur;
-        }
-    }
+	public Sample SampleAt(double time)
+	{
+		double num = time % Duration;
+		if (num < 0.0)
+		{
+			num += Duration;
+		}
+		double num2 = num / dt;
+		Sample sample = Frame(num2);
+		double num3 = 0.2 / dt;
+		int num4 = -1;
+		int[] array = cutFrames;
+		foreach (int num5 in array)
+		{
+			if ((double)num5 <= num2)
+			{
+				num4 = num5;
+			}
+		}
+		if (num4 >= 0 && num2 - (double)num4 < num3)
+		{
+			return Blend(Frame(num4 - 1), sample, M.Smooth((num2 - (double)num4) / num3));
+		}
+		if (num > Duration - 0.2)
+		{
+			return Blend(sample, Frame(0.0), M.Smooth((num - (Duration - 0.2)) / 0.2));
+		}
+		return sample;
+	}
 }

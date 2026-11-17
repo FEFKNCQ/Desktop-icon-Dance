@@ -1,82 +1,114 @@
 using System;
 using System.Threading;
 
-namespace DesktopDance
+namespace DesktopDance;
+
+public sealed class HotKeys
 {
-    /// <summary>
-    /// 全局热键：只有 Esc，而且只在跳舞期间占用。
-    /// 热键跑在自己的线程上，不依赖界面线程——万一界面卡死，按热键仍然有反应（见 Program 里的处理：
-    /// 界面 3 秒内没响应就直接结束进程，舞台窗口随进程一起消失）。
-    /// </summary>
-    public sealed class HotKeys
-    {
-        public const int IdEscape = 2;
-        const uint MsgEscOn = Native.WM_APP + 1, MsgEscOff = Native.WM_APP + 2, MsgQuit = Native.WM_APP + 3;
+	public const int IdEscape = 2;
 
-        readonly ManualResetEventSlim ready = new ManualResetEventSlim(false);
-        Thread? thread;
-        uint threadId;
-        volatile bool escOk;
+	private const uint MsgEscOn = 32769u;
 
-        /// <summary>热键按下时调用（在热键线程上）。参数是 IdEscape。</summary>
-        public Action<int>? Pressed;
+	private const uint MsgEscOff = 32770u;
 
-        public bool EscapeRegistered => escOk;
+	private const uint MsgQuit = 32771u;
 
-        public void Start()
-        {
-            if (thread != null) return;
-            thread = new Thread(Loop) { IsBackground = true, Name = "hotkeys" };
-            thread.Start();
-            ready.Wait(3000);
-        }
+	private readonly ManualResetEventSlim ready = new ManualResetEventSlim(initialState: false);
 
-        void Loop()
-        {
-            try
-            {
-                threadId = Native.GetCurrentThreadId();
-                Native.PeekMessage(out MSG _, IntPtr.Zero, 0, 0, 0);          // 让系统给这个线程建好消息队列
-            }
-            finally { ready.Set(); }
+	private Thread? thread;
 
-            while (Native.GetMessage(out MSG msg, IntPtr.Zero, 0, 0) > 0)
-            {
-                if (msg.message == Native.WM_HOTKEY)
-                {
-                    int id = (int)msg.wParam.ToInt64();
-                    Log.Write("热键触发：Esc");
-                    try { Pressed?.Invoke(id); } catch (Exception ex) { Log.Write("热键处理出错：" + ex.Message); }
-                }
-                else if (msg.message == MsgEscOn)
-                {
-                    if (!escOk)
-                    {
-                        escOk = Native.RegisterHotKey(IntPtr.Zero, IdEscape, Native.MOD_NOREPEAT, Native.VK_ESCAPE);
-                        if (!escOk) Log.Write("热键 Esc 注册失败（可能被别的软件占用），请点「恢复桌面」按钮或在桌面上点一下");
-                    }
-                }
-                else if (msg.message == MsgEscOff)
-                {
-                    if (escOk) { Native.UnregisterHotKey(IntPtr.Zero, IdEscape); escOk = false; }
-                }
-                else if (msg.message == MsgQuit)
-                {
-                    break;
-                }
-            }
-            if (escOk) Native.UnregisterHotKey(IntPtr.Zero, IdEscape);
-        }
+	private uint threadId;
 
-        /// <summary>跳舞期间占用 Esc；停下来就还给别的程序。</summary>
-        public void SetEscape(bool on)
-        {
-            if (threadId != 0) Native.PostThreadMessage(threadId, on ? MsgEscOn : MsgEscOff, IntPtr.Zero, IntPtr.Zero);
-        }
+	private volatile bool escOk;
 
-        public void Stop()
-        {
-            if (threadId != 0) Native.PostThreadMessage(threadId, MsgQuit, IntPtr.Zero, IntPtr.Zero);
-        }
-    }
+	public Action<int>? Pressed;
+
+	public bool EscapeRegistered => escOk;
+
+	public void Start()
+	{
+		if (thread == null)
+		{
+			thread = new Thread(Loop)
+			{
+				IsBackground = true,
+				Name = "hotkeys"
+			};
+			thread.Start();
+			ready.Wait(3000);
+		}
+	}
+
+	private void Loop()
+	{
+		try
+		{
+			threadId = Native.GetCurrentThreadId();
+			Native.PeekMessage(out var _, IntPtr.Zero, 0u, 0u, 0u);
+		}
+		finally
+		{
+			ready.Set();
+		}
+		MSG lpMsg2;
+		while (Native.GetMessage(out lpMsg2, IntPtr.Zero, 0u, 0u) > 0)
+		{
+			if (lpMsg2.message == 786)
+			{
+				int obj = (int)((IntPtr)lpMsg2.wParam).ToInt64();
+				Log.Write("热键触发：Esc");
+				try
+				{
+					Pressed?.Invoke(obj);
+				}
+				catch (Exception ex)
+				{
+					Log.Write("热键处理出错：" + ex.Message);
+				}
+			}
+			else if (lpMsg2.message == 32769)
+			{
+				if (!escOk)
+				{
+					escOk = Native.RegisterHotKey(IntPtr.Zero, 2, 16384u, 27u);
+					if (!escOk)
+					{
+						Log.Write("热键 Esc 注册失败（可能被别的软件占用），请点「恢复桌面」按钮或在桌面上点一下");
+					}
+				}
+			}
+			else if (lpMsg2.message == 32770)
+			{
+				if (escOk)
+				{
+					Native.UnregisterHotKey(IntPtr.Zero, 2);
+					escOk = false;
+				}
+			}
+			else if (lpMsg2.message == 32771)
+			{
+				break;
+			}
+		}
+		if (escOk)
+		{
+			Native.UnregisterHotKey(IntPtr.Zero, 2);
+		}
+	}
+
+	public void SetEscape(bool on)
+	{
+		if (threadId != 0)
+		{
+			Native.PostThreadMessage(threadId, on ? 32769u : 32770u, IntPtr.Zero, IntPtr.Zero);
+		}
+	}
+
+	public void Stop()
+	{
+		if (threadId != 0)
+		{
+			Native.PostThreadMessage(threadId, 32771u, IntPtr.Zero, IntPtr.Zero);
+		}
+	}
 }

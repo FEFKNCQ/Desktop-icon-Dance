@@ -1,12 +1,17 @@
 **中文** | [English](README.en.md)
 
-# 桌面图标跳舞 · DesktopDance
+# 桌面图标跳舞 · Desktop-icon-Dance
+
+> **本项目基于原作者 [jiafufang63-cpu/DesktopDance](https://github.com/jiafufang63-cpu/DesktopDance) 迭代更新**。
+> 在原版「打篮球、列队、律动、自由」四种玩法之上，新增了按网页动画引擎逐帧翻译的四个舞蹈模式
+> （狗熊哆嗦毛、闪身步、MJ 太空步、科目三）与自动串烧的「测试模式」，并做了节奏跟随、
+> 动作边界、自检等多处改进。创意与原始实现归功于原作者 jiafufang63-cpu，感谢它的优秀点子。
 
 **你桌面上的图标，会自己站起来打篮球。**
 
 点一下「开始蹦迪」，桌面上的文件和应用图标就拼成一个小人：运球、转身，你放的歌越快，它打得越快。按一下 `Esc`，所有图标回到原位。
 
-- 🏀 **四种玩法**：打篮球、列队、律动、自由
+- 🏀 **九种玩法**：打篮球、狗熊哆嗦毛、闪身步、MJ 太空步、科目三、测试串烧、列队、律动、自由
 - 🎵 **跟着音乐跳**：听的是电脑正在放的歌，不用麦克风
 - 🎯 **用你自己的图标**：桌面上有什么就用什么，哪个图标当篮球也由你挑
 - 🔒 **不动你的文件**：不删、不改名、不移动，关掉程序桌面就是原样
@@ -21,6 +26,8 @@
 <a href="https://pan.baidu.com/s/1SftzWSnLxvVajtRb-FCAkg?pwd=7mbu"><img src="docs/download-win.svg" width="260" alt="下载 Windows 版"></a>
 
 点上面的按钮就会开始下载，不用注册、不用登录。
+
+也可以直接到 [GitHub Releases](https://github.com/FEFKNCQ/Desktop-icon-Dance/releases/latest) 下载最新 Windows 版（`Desktop-icon-Dance.exe`，单文件、免安装）。
 
 - **不知道自己是哪种电脑？** 屏幕左上角有苹果图标的是 Mac；屏幕下方有四个小方块图标的是 Windows。
 - **Mac** 需要系统是 macOS 14.2 或更新。查看方法：点屏幕左上角的苹果图标 → 「关于本机」。

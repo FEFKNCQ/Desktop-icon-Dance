@@ -7,11 +7,11 @@
     <Nullable>enable</Nullable>
     <LangVersion>12</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>
-    <AssemblyName>DesktopDance</AssemblyName>
+    <AssemblyName>Desktop-icon-Dance</AssemblyName>
     <RootNamespace>DesktopDance</RootNamespace>
-    <Version>1.0.0</Version>
-    <Product>DesktopDance</Product>
-    <AssemblyTitle>DesktopDance</AssemblyTitle>
+    <Version>1.1.0</Version>
+    <Product>Desktop-icon-Dance</Product>
+    <AssemblyTitle>Desktop-icon-Dance</AssemblyTitle>
     <Authors>Jennifer Fang</Authors>
     <Company>Jennifer Fang</Company>
     <Copyright>Copyright (c) 2026 Jennifer Fang. Noncommercial use only.</Copyright>

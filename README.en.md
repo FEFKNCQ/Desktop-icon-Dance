@@ -1,12 +1,19 @@
 **English** | [中文](README.zh-CN.md)
 
-# DesktopDance
+# Desktop-icon-Dance
+
+> **This project is an iteration on the original [DesktopDance by jiafufang63-cpu](https://github.com/jiafufang63-cpu/DesktopDance).**
+> On top of the original four modes (Basketball, Line, Groove, Free), it adds four dance modes
+> frame-by-frame translated from web animation engines (Bear Shiver, Flash Step, MJ Moonwalk,
+> Subject Three) plus an auto-mixing "Test Reel", along with many improvements to beat tracking,
+> motion bounds and self-testing. Credit for the idea and the original implementation goes to
+> jiafufang63-cpu — thank you for the great concept.
 
 **The icons on your desktop get up and play basketball.**
 
 Click **Start** and your files and app icons assemble into a little figure that dribbles and spins. The faster your music, the faster it plays. Press `Esc` and every icon is back where it was.
 
-- 🏀 **Four modes**: Basketball, Line, Groove, Free
+- 🏀 **Nine modes**: Basketball, Bear Shiver, Flash Step, MJ Moonwalk, Subject Three, Test Reel, Line, Groove, Free
 - 🎵 **Follows your music**: it listens to what the computer is playing, no microphone
 - 🎯 **Your own icons**: it uses whatever is on your desktop, and you pick which icon is the ball
 - 🔒 **Your files are never touched**: nothing is deleted, renamed or moved; quit the app and the desktop is as it was
