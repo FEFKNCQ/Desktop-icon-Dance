@@ -2,7 +2,7 @@
 
 # 桌面图标跳舞 · Desktop-icon-Dance
 
-> **本项目基于原作者 [jiafufang63-cpu/DesktopDance](https://github.com/jiafufang63-cpu/DesktopDance) 迭代更新**。
+> **本项目基于原作者 [jiafufang63-cpu](https://github.com/jiafufang63-cpu/DesktopDance) 迭代更新**。
 > 在原版「打篮球、列队、律动、自由」四种玩法之上，新增了按网页动画引擎逐帧翻译的四个舞蹈模式
 > （狗熊哆嗦毛、闪身步、MJ 太空步、科目三）与自动串烧的「测试模式」，并做了节奏跟随、
 > 动作边界、自检等多处改进。创意与原始实现归功于原作者 jiafufang63-cpu，感谢它的优秀点子。
