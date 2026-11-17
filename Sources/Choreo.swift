@@ -324,7 +324,7 @@ final class Choreographer {
                         ball: s.ball, lean: lean, ballAlpha: s.ballAlpha)
     }
 
-    private func figure(_ n: Int, _ T: Tempo) -> [Pose] {
+    func figure(_ n: Int, _ T: Tempo) -> [Pose] {
         guard n >= 8 else { return ring(n, T) }
         let s = stage
         let sk: Skeleton
